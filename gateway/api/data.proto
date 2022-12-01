@@ -1,0 +1,40 @@
+syntax = "proto3";
+package gateway.api;
+option go_package = "../api";
+// ---------------------------------------------------------------------------------------
+
+message RegisterNewUserRequest {
+  string name = 1;
+  string password = 3;
+  CitizenIdentityCard citizen_identity_card = 2;
+}
+
+message CitizenIdentityCard {
+  string id = 1;
+  string register_date = 2;
+  string expire_date = 3;
+  string provider = 4;
+  string born = 5;
+}
+
+message RegisterNewUserResponse {
+  int64 code = 1;
+  string message = 2;
+}
+
+message AuthorizeUserRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message AuthorizeUserResponse {
+  int64 code = 1;
+  string message = 2;
+  UserInfo data = 3;
+}
+
+message UserInfo {
+  int64 id = 1;
+  string username = 2;
+  string name = 3;
+}

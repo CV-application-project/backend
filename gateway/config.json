@@ -1,0 +1,22 @@
+{
+  "env": "dev",
+  "server": {
+    "grpc": {
+      "host": "0.0.0.0",
+      "port": 10443
+    },
+    "http": {
+      "host": "0.0.0.0",
+      "port": 10080
+    }
+  },
+  "mysql": {
+    "host": "127.0.0.1",
+    "database": "smart_work_time",
+    "port": 3306,
+    "username": "root",
+    "password": "mysqlPassword",
+    "options": "?parseTime=true"
+  },
+  "migration_folder": "file://gateway/sql/migrations"
+}

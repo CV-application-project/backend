@@ -1,0 +1,22 @@
+syntax = "proto3";
+package gateway.api;
+option go_package = "../api";
+// ---------------------------------------------------------------------------------------
+
+import "library/googleapis/google/api/annotations.proto";
+import "gateway/api/data.proto";
+
+service GatewayService {
+  rpc RegisterNewUser(RegisterNewUserRequest) returns (RegisterNewUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/user/register",
+      body: "*"
+    };
+  }
+  rpc AuthorizeUser(AuthorizeUserRequest) returns (AuthorizeUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/user/authorize",
+      body: "*"
+    };
+  }
+}
