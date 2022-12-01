@@ -24,17 +24,33 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.createNewUserInfoStmt, err = db.PrepareContext(ctx, createNewUserInfo); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateNewUserInfo: %w", err)
+	}
 	if q.getUserInfoByIdStmt, err = db.PrepareContext(ctx, getUserInfoById); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserInfoById: %w", err)
+	}
+	if q.updateUserInfoByUsernameStmt, err = db.PrepareContext(ctx, updateUserInfoByUsername); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUserInfoByUsername: %w", err)
 	}
 	return &q, nil
 }
 
 func (q *Queries) Close() error {
 	var err error
+	if q.createNewUserInfoStmt != nil {
+		if cerr := q.createNewUserInfoStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createNewUserInfoStmt: %w", cerr)
+		}
+	}
 	if q.getUserInfoByIdStmt != nil {
 		if cerr := q.getUserInfoByIdStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserInfoByIdStmt: %w", cerr)
+		}
+	}
+	if q.updateUserInfoByUsernameStmt != nil {
+		if cerr := q.updateUserInfoByUsernameStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserInfoByUsernameStmt: %w", cerr)
 		}
 	}
 	return err
@@ -74,15 +90,19 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                  DBTX
-	tx                  *sql.Tx
-	getUserInfoByIdStmt *sql.Stmt
+	db                           DBTX
+	tx                           *sql.Tx
+	createNewUserInfoStmt        *sql.Stmt
+	getUserInfoByIdStmt          *sql.Stmt
+	updateUserInfoByUsernameStmt *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                  tx,
-		tx:                  tx,
-		getUserInfoByIdStmt: q.getUserInfoByIdStmt,
+		db:                           tx,
+		tx:                           tx,
+		createNewUserInfoStmt:        q.createNewUserInfoStmt,
+		getUserInfoByIdStmt:          q.getUserInfoByIdStmt,
+		updateUserInfoByUsernameStmt: q.updateUserInfoByUsernameStmt,
 	}
 }

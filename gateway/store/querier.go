@@ -6,11 +6,13 @@ package store
 
 import (
 	"context"
+	"database/sql"
 )
 
 type Querier interface {
+	CreateNewUserInfo(ctx context.Context, arg CreateNewUserInfoParams) (sql.Result, error)
 	GetUserInfoById(ctx context.Context, id int64) (UserInfo, error)
-	Close() error
+	UpdateUserInfoByUsername(ctx context.Context, arg UpdateUserInfoByUsernameParams) (sql.Result, error)
 }
 
 var _ Querier = (*Queries)(nil)

@@ -1,0 +1,1 @@
+alter table user_info add unique key (username);
