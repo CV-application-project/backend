@@ -3,8 +3,8 @@ package database
 import "Backend-Server/library/server"
 
 type Base struct {
-	Env    string       `json:"env" mapstructure:"env"`
-	Server ServerConfig `json:"server" mapstructure:"server"`
+	Env    string       `json:"env" yaml:"env" mapstructure:"env"`
+	Server ServerConfig `json:"server" yaml:"server" mapstructure:"server"`
 }
 
 type ServerConfig struct {

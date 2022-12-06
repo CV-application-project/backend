@@ -1,6 +1,7 @@
 syntax = "proto3";
 package gateway.api;
 option go_package = "../api";
+
 // ---------------------------------------------------------------------------------------
 
 import "library/googleapis/google/api/annotations.proto";
@@ -16,6 +17,12 @@ service GatewayService {
   rpc AuthorizeUser(AuthorizeUserRequest) returns (AuthorizeUserResponse) {
     option (google.api.http) = {
       post: "/v1/user/authorize",
+      body: "*"
+    };
+  }
+  rpc UpdateCitizenIdentityCard(UpdateCitizenIdentityCardRequest) returns (UpdateCitizenIdentityCardResponse) {
+    option (google.api.http) = {
+      post: "/v1/user/citizen-card",
       body: "*"
     };
   }

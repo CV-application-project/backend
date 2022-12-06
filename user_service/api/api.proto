@@ -1,0 +1,23 @@
+syntax = "proto3";
+package user_service.api;
+option go_package = "../api";
+
+// ---------------------------------------------------------------------------------------
+
+import "library/googleapis/google/api/annotations.proto";
+import "user_service/api/data.proto";
+
+service UserService {
+  rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/register",
+      body: "*"
+    };
+  }
+  rpc AuthorizeUser(AuthorizeUserRequest) returns (AuthorizeUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/authorize",
+      body: "*"
+    };
+  }
+}

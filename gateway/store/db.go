@@ -24,33 +24,41 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
-	if q.createNewUserInfoStmt, err = db.PrepareContext(ctx, createNewUserInfo); err != nil {
-		return nil, fmt.Errorf("error preparing query CreateNewUserInfo: %w", err)
+	if q.createUserInfoStmt, err = db.PrepareContext(ctx, createUserInfo); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateUserInfo: %w", err)
 	}
-	if q.getUserInfoByIdStmt, err = db.PrepareContext(ctx, getUserInfoById); err != nil {
-		return nil, fmt.Errorf("error preparing query GetUserInfoById: %w", err)
+	if q.getUserInfoByTokenStmt, err = db.PrepareContext(ctx, getUserInfoByToken); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserInfoByToken: %w", err)
 	}
-	if q.updateUserInfoByUsernameStmt, err = db.PrepareContext(ctx, updateUserInfoByUsername); err != nil {
-		return nil, fmt.Errorf("error preparing query UpdateUserInfoByUsername: %w", err)
+	if q.getUserInfoByUsernameOrEmailStmt, err = db.PrepareContext(ctx, getUserInfoByUsernameOrEmail); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserInfoByUsernameOrEmail: %w", err)
+	}
+	if q.updateUserInfoTokenByUserIdStmt, err = db.PrepareContext(ctx, updateUserInfoTokenByUserId); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUserInfoTokenByUserId: %w", err)
 	}
 	return &q, nil
 }
 
 func (q *Queries) Close() error {
 	var err error
-	if q.createNewUserInfoStmt != nil {
-		if cerr := q.createNewUserInfoStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing createNewUserInfoStmt: %w", cerr)
+	if q.createUserInfoStmt != nil {
+		if cerr := q.createUserInfoStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createUserInfoStmt: %w", cerr)
 		}
 	}
-	if q.getUserInfoByIdStmt != nil {
-		if cerr := q.getUserInfoByIdStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getUserInfoByIdStmt: %w", cerr)
+	if q.getUserInfoByTokenStmt != nil {
+		if cerr := q.getUserInfoByTokenStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserInfoByTokenStmt: %w", cerr)
 		}
 	}
-	if q.updateUserInfoByUsernameStmt != nil {
-		if cerr := q.updateUserInfoByUsernameStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing updateUserInfoByUsernameStmt: %w", cerr)
+	if q.getUserInfoByUsernameOrEmailStmt != nil {
+		if cerr := q.getUserInfoByUsernameOrEmailStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserInfoByUsernameOrEmailStmt: %w", cerr)
+		}
+	}
+	if q.updateUserInfoTokenByUserIdStmt != nil {
+		if cerr := q.updateUserInfoTokenByUserIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserInfoTokenByUserIdStmt: %w", cerr)
 		}
 	}
 	return err
@@ -90,19 +98,21 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                           DBTX
-	tx                           *sql.Tx
-	createNewUserInfoStmt        *sql.Stmt
-	getUserInfoByIdStmt          *sql.Stmt
-	updateUserInfoByUsernameStmt *sql.Stmt
+	db                               DBTX
+	tx                               *sql.Tx
+	createUserInfoStmt               *sql.Stmt
+	getUserInfoByTokenStmt           *sql.Stmt
+	getUserInfoByUsernameOrEmailStmt *sql.Stmt
+	updateUserInfoTokenByUserIdStmt  *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                           tx,
-		tx:                           tx,
-		createNewUserInfoStmt:        q.createNewUserInfoStmt,
-		getUserInfoByIdStmt:          q.getUserInfoByIdStmt,
-		updateUserInfoByUsernameStmt: q.updateUserInfoByUsernameStmt,
+		db:                               tx,
+		tx:                               tx,
+		createUserInfoStmt:               q.createUserInfoStmt,
+		getUserInfoByTokenStmt:           q.getUserInfoByTokenStmt,
+		getUserInfoByUsernameOrEmailStmt: q.getUserInfoByUsernameOrEmailStmt,
+		updateUserInfoTokenByUserIdStmt:  q.updateUserInfoTokenByUserIdStmt,
 	}
 }

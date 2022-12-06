@@ -1,0 +1,1 @@
+alter table user add column email nvarchar(255) not null;

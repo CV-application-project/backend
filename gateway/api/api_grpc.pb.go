@@ -23,7 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GatewayServiceClient interface {
 	RegisterNewUser(ctx context.Context, in *RegisterNewUserRequest, opts ...grpc.CallOption) (*RegisterNewUserResponse, error)
-	HelloWorld(ctx context.Context, in *HelloWorldRequest, opts ...grpc.CallOption) (*HelloWorldResponse, error)
+	AuthorizeUser(ctx context.Context, in *AuthorizeUserRequest, opts ...grpc.CallOption) (*AuthorizeUserResponse, error)
+	UpdateCitizenIdentityCard(ctx context.Context, in *UpdateCitizenIdentityCardRequest, opts ...grpc.CallOption) (*UpdateCitizenIdentityCardResponse, error)
 }
 
 type gatewayServiceClient struct {
@@ -43,9 +44,18 @@ func (c *gatewayServiceClient) RegisterNewUser(ctx context.Context, in *Register
 	return out, nil
 }
 
-func (c *gatewayServiceClient) HelloWorld(ctx context.Context, in *HelloWorldRequest, opts ...grpc.CallOption) (*HelloWorldResponse, error) {
-	out := new(HelloWorldResponse)
-	err := c.cc.Invoke(ctx, "/gateway.api.GatewayService/HelloWorld", in, out, opts...)
+func (c *gatewayServiceClient) AuthorizeUser(ctx context.Context, in *AuthorizeUserRequest, opts ...grpc.CallOption) (*AuthorizeUserResponse, error) {
+	out := new(AuthorizeUserResponse)
+	err := c.cc.Invoke(ctx, "/gateway.api.GatewayService/AuthorizeUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gatewayServiceClient) UpdateCitizenIdentityCard(ctx context.Context, in *UpdateCitizenIdentityCardRequest, opts ...grpc.CallOption) (*UpdateCitizenIdentityCardResponse, error) {
+	out := new(UpdateCitizenIdentityCardResponse)
+	err := c.cc.Invoke(ctx, "/gateway.api.GatewayService/UpdateCitizenIdentityCard", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +67,8 @@ func (c *gatewayServiceClient) HelloWorld(ctx context.Context, in *HelloWorldReq
 // for forward compatibility
 type GatewayServiceServer interface {
 	RegisterNewUser(context.Context, *RegisterNewUserRequest) (*RegisterNewUserResponse, error)
-	HelloWorld(context.Context, *HelloWorldRequest) (*HelloWorldResponse, error)
+	AuthorizeUser(context.Context, *AuthorizeUserRequest) (*AuthorizeUserResponse, error)
+	UpdateCitizenIdentityCard(context.Context, *UpdateCitizenIdentityCardRequest) (*UpdateCitizenIdentityCardResponse, error)
 	mustEmbedUnimplementedGatewayServiceServer()
 }
 
@@ -68,8 +79,11 @@ type UnimplementedGatewayServiceServer struct {
 func (UnimplementedGatewayServiceServer) RegisterNewUser(context.Context, *RegisterNewUserRequest) (*RegisterNewUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterNewUser not implemented")
 }
-func (UnimplementedGatewayServiceServer) HelloWorld(context.Context, *HelloWorldRequest) (*HelloWorldResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method HelloWorld not implemented")
+func (UnimplementedGatewayServiceServer) AuthorizeUser(context.Context, *AuthorizeUserRequest) (*AuthorizeUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AuthorizeUser not implemented")
+}
+func (UnimplementedGatewayServiceServer) UpdateCitizenIdentityCard(context.Context, *UpdateCitizenIdentityCardRequest) (*UpdateCitizenIdentityCardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCitizenIdentityCard not implemented")
 }
 func (UnimplementedGatewayServiceServer) mustEmbedUnimplementedGatewayServiceServer() {}
 
@@ -102,20 +116,38 @@ func _GatewayService_RegisterNewUser_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GatewayService_HelloWorld_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloWorldRequest)
+func _GatewayService_AuthorizeUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthorizeUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GatewayServiceServer).HelloWorld(ctx, in)
+		return srv.(GatewayServiceServer).AuthorizeUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gateway.api.GatewayService/HelloWorld",
+		FullMethod: "/gateway.api.GatewayService/AuthorizeUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GatewayServiceServer).HelloWorld(ctx, req.(*HelloWorldRequest))
+		return srv.(GatewayServiceServer).AuthorizeUser(ctx, req.(*AuthorizeUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GatewayService_UpdateCitizenIdentityCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCitizenIdentityCardRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayServiceServer).UpdateCitizenIdentityCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gateway.api.GatewayService/UpdateCitizenIdentityCard",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayServiceServer).UpdateCitizenIdentityCard(ctx, req.(*UpdateCitizenIdentityCardRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -132,8 +164,12 @@ var GatewayService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GatewayService_RegisterNewUser_Handler,
 		},
 		{
-			MethodName: "HelloWorld",
-			Handler:    _GatewayService_HelloWorld_Handler,
+			MethodName: "AuthorizeUser",
+			Handler:    _GatewayService_AuthorizeUser_Handler,
+		},
+		{
+			MethodName: "UpdateCitizenIdentityCard",
+			Handler:    _GatewayService_UpdateCitizenIdentityCard_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

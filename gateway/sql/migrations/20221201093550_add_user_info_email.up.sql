@@ -1,1 +1,0 @@
-alter table user_info add column email nvarchar(255) not null;

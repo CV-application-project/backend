@@ -10,9 +10,11 @@ import (
 )
 
 type Querier interface {
-	CreateNewUserInfo(ctx context.Context, arg CreateNewUserInfoParams) (sql.Result, error)
-	GetUserInfoById(ctx context.Context, id int64) (UserInfo, error)
-	UpdateUserInfoByUsername(ctx context.Context, arg UpdateUserInfoByUsernameParams) (sql.Result, error)
+	CreateUserInfo(ctx context.Context, arg CreateUserInfoParams) (sql.Result, error)
+	GetUserInfoByToken(ctx context.Context, token string) (UserInfo, error)
+	GetUserInfoByUsernameOrEmail(ctx context.Context, arg GetUserInfoByUsernameOrEmailParams) (UserInfo, error)
+	UpdateUserInfoTokenByUserId(ctx context.Context, arg UpdateUserInfoTokenByUserIdParams) (sql.Result, error)
+	Close() error
 }
 
 var _ Querier = (*Queries)(nil)

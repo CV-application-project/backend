@@ -1,10 +1,9 @@
 package service
 
 import (
-	"Backend-Server/gateway/api"
-	"Backend-Server/gateway/client"
-	"Backend-Server/gateway/config"
-	"Backend-Server/gateway/store"
+	"Backend-Server/user_service/api"
+	"Backend-Server/user_service/config"
+	"Backend-Server/user_service/store"
 	"context"
 	"github.com/go-logr/logr"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -12,19 +11,18 @@ import (
 )
 
 type Service struct {
-	log        logr.Logger
-	cfg        *config.Config
-	store      store.Querier
-	userClient client.UserClient
-	api.UnimplementedGatewayServiceServer
+	log   logr.Logger
+	cfg   *config.Config
+	store store.Querier
+	api.UnimplementedUserServiceServer
 }
 
 func (s *Service) RegisterWithServer(server *grpc.Server) {
-	api.RegisterGatewayServiceServer(server, s)
+	api.RegisterUserServiceServer(server, s)
 }
 
 func (s *Service) RegisterWithHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	err := api.RegisterGatewayServiceHandler(ctx, mux, conn)
+	err := api.RegisterUserServiceHandler(ctx, mux, conn)
 	if err != nil {
 		return err
 	}
@@ -32,15 +30,10 @@ func (s *Service) RegisterWithHandler(ctx context.Context, mux *runtime.ServeMux
 }
 
 func NewService(logger logr.Logger, store store.Querier, cfg *config.Config) *Service {
-	userClient, err := client.NewUserClient(logger, cfg.ClientHost.UserService)
-	if err != nil {
-		userClient = nil
-	}
 	return &Service{
-		cfg:        cfg,
-		log:        logger,
-		store:      store,
-		userClient: userClient,
+		cfg:   cfg,
+		log:   logger,
+		store: store,
 	}
 }
 

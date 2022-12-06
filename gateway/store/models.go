@@ -5,17 +5,16 @@
 package store
 
 import (
-	"database/sql"
 	"time"
 )
 
 type UserInfo struct {
-	ID        int64          `json:"id"`
-	Name      string         `json:"name"`
-	Username  string         `json:"username"`
-	Password  string         `json:"password"`
-	ExtraData sql.NullString `json:"extra_data"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	Email     string         `json:"email"`
+	ID        int64     `json:"id"`
+	UserID    int64     `json:"user_id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Token     string    `json:"token"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	ExpiredAt time.Time `json:"expired_at"`
 }

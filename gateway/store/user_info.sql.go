@@ -8,59 +8,96 @@ package store
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
-const createNewUserInfo = `-- name: CreateNewUserInfo :execresult
-insert into user_info (name, username, password, extra_data, email) VALUES (?, ?, ?, ?, ?)
+const createUserInfo = `-- name: CreateUserInfo :execresult
+insert into user_info (user_id, username, email, token, expired_at)
+VALUES (?, ?, ?, ?, ?)
 `
 
-type CreateNewUserInfoParams struct {
-	Name      string         `json:"name"`
-	Username  string         `json:"username"`
-	Password  string         `json:"password"`
-	ExtraData sql.NullString `json:"extra_data"`
-	Email     string         `json:"email"`
+type CreateUserInfoParams struct {
+	UserID    int64     `json:"user_id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Token     string    `json:"token"`
+	ExpiredAt time.Time `json:"expired_at"`
 }
 
-func (q *Queries) CreateNewUserInfo(ctx context.Context, arg CreateNewUserInfoParams) (sql.Result, error) {
-	return q.exec(ctx, q.createNewUserInfoStmt, createNewUserInfo,
-		arg.Name,
+func (q *Queries) CreateUserInfo(ctx context.Context, arg CreateUserInfoParams) (sql.Result, error) {
+	return q.exec(ctx, q.createUserInfoStmt, createUserInfo,
+		arg.UserID,
 		arg.Username,
-		arg.Password,
-		arg.ExtraData,
 		arg.Email,
+		arg.Token,
+		arg.ExpiredAt,
 	)
 }
 
-const getUserInfoById = `-- name: GetUserInfoById :one
-select id, name, username, password, extra_data, created_at, updated_at, email from user_info where id = ? limit 1
+const getUserInfoByToken = `-- name: GetUserInfoByToken :one
+select id, user_id, username, email, token, created_at, updated_at, expired_at
+from user_info
+where token = ?
+  and expired_at > now()
 `
 
-func (q *Queries) GetUserInfoById(ctx context.Context, id int64) (UserInfo, error) {
-	row := q.queryRow(ctx, q.getUserInfoByIdStmt, getUserInfoById, id)
+func (q *Queries) GetUserInfoByToken(ctx context.Context, token string) (UserInfo, error) {
+	row := q.queryRow(ctx, q.getUserInfoByTokenStmt, getUserInfoByToken, token)
 	var i UserInfo
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
+		&i.UserID,
 		&i.Username,
-		&i.Password,
-		&i.ExtraData,
+		&i.Email,
+		&i.Token,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Email,
+		&i.ExpiredAt,
 	)
 	return i, err
 }
 
-const updateUserInfoByUsername = `-- name: UpdateUserInfoByUsername :execresult
-update user_info set extra_data = ? where username = ?
+const getUserInfoByUsernameOrEmail = `-- name: GetUserInfoByUsernameOrEmail :one
+select id, user_id, username, email, token, created_at, updated_at, expired_at
+from user_info
+where username = ?
+   or email = ?
+limit 1
 `
 
-type UpdateUserInfoByUsernameParams struct {
-	ExtraData sql.NullString `json:"extra_data"`
-	Username  string         `json:"username"`
+type GetUserInfoByUsernameOrEmailParams struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
 }
 
-func (q *Queries) UpdateUserInfoByUsername(ctx context.Context, arg UpdateUserInfoByUsernameParams) (sql.Result, error) {
-	return q.exec(ctx, q.updateUserInfoByUsernameStmt, updateUserInfoByUsername, arg.ExtraData, arg.Username)
+func (q *Queries) GetUserInfoByUsernameOrEmail(ctx context.Context, arg GetUserInfoByUsernameOrEmailParams) (UserInfo, error) {
+	row := q.queryRow(ctx, q.getUserInfoByUsernameOrEmailStmt, getUserInfoByUsernameOrEmail, arg.Username, arg.Email)
+	var i UserInfo
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Username,
+		&i.Email,
+		&i.Token,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.ExpiredAt,
+	)
+	return i, err
+}
+
+const updateUserInfoTokenByUserId = `-- name: UpdateUserInfoTokenByUserId :execresult
+update user_info
+set token = ? and expired_at = ?
+where user_id = ?
+`
+
+type UpdateUserInfoTokenByUserIdParams struct {
+	Token     string    `json:"token"`
+	ExpiredAt time.Time `json:"expired_at"`
+	UserID    int64     `json:"user_id"`
+}
+
+func (q *Queries) UpdateUserInfoTokenByUserId(ctx context.Context, arg UpdateUserInfoTokenByUserIdParams) (sql.Result, error) {
+	return q.exec(ctx, q.updateUserInfoTokenByUserIdStmt, updateUserInfoTokenByUserId, arg.Token, arg.ExpiredAt, arg.UserID)
 }

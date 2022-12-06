@@ -1,8 +1,21 @@
-/* name: GetUserInfoById :one */
-select * from user_info where id = ? limit 1;
+/* name: GetUserInfoByUsernameOrEmail :one */
+select *
+from user_info
+where username = ?
+   or email = ?
+limit 1;
 
-/* name: CreateNewUserInfo :execresult */
-insert into user_info (name, username, password, extra_data, email) VALUES (?, ?, ?, ?, ?);
+/* name: GetUserInfoByToken :one */
+select *
+from user_info
+where token = ?
+  and expired_at > now();
 
-/* name: UpdateUserInfoByUsername :execresult */
-update user_info set extra_data = ? where username = ?;
+/* name: UpdateUserInfoTokenByUserId :execresult */
+update user_info
+set token = ? and expired_at = ?
+where user_id = ?;
+
+/* name: CreateUserInfo :execresult */
+insert into user_info (user_id, username, email, token, expired_at)
+VALUES (?, ?, ?, ?, ?);
