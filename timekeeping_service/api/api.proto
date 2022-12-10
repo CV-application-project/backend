@@ -1,0 +1,23 @@
+syntax = "proto3";
+package timekeeping_service.api;
+option go_package = "../api";
+
+// ---------------------------------------------------------------------------------------
+
+import "library/googleapis/google/api/annotations.proto";
+import "timekeeping_service/api/data.proto";
+
+service TimekeepingService {
+  rpc GetHistoryOfUser(GetHistoryOfUserRequest) returns (GetHistoryOfUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/timekeeping/history",
+      body: "*"
+    };
+  }
+  rpc CreateHistoryOfUser(CreateHistoryOfUserRequest) returns (CreateHistoryOfUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/timekeeping/create",
+      body: "*"
+    };
+  }
+}

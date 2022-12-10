@@ -3,3 +3,5 @@ gen-api-proto:
 update:
 	go mod tidy
 	go mod vendor
+init:
+	sh ./init.sh

@@ -1,0 +1,56 @@
+syntax = "proto3";
+package timekeeping_service.api;
+option go_package = "../api";
+
+// ---------------------------------------------------------------------------------------
+
+import "library/envoyproxy/validate/validate.proto";
+
+message GetHistoryOfUserRequest {
+  // id of user
+  int64 user_id = 1 [(validate.rules).int64 = {gt: 0}];
+  HistoryTime time = 2;
+}
+
+message GetHistoryOfUserResponse {
+  repeated TimekeepingHistory data = 1;
+
+}
+
+message HistoryTime {
+  uint32 day = 1 [(validate.rules).uint32 = {gte: 0, lt: 32}];
+  uint32 month = 2 [(validate.rules).uint32 = {gte: 0, lt: 13}];
+  uint32 year = 3 [(validate.rules).uint32 = {gt: 0}];
+}
+
+message TimekeepingHistory {
+  int64 user_id = 1;
+  uint32 day = 2 [(validate.rules).uint32 = {gt: 0, lt: 32}];
+  uint32 month = 3 [(validate.rules).uint32 = {gt: 0, lt: 13}];
+  uint32 year = 4 [(validate.rules).uint32 = {gt: 0}];
+  Data data = 5;
+}
+
+message Data {
+  uint64 total_time = 1;
+  int64 start_time = 2;
+  int64 end_time = 3;
+  message Line {
+    int64 index = 1;
+    int64 start_time = 2;
+    int64 end_time = 3;
+  }
+  repeated Line details = 4;
+}
+
+message CreateHistoryOfUserRequest {
+  int64 user_id = 1[(validate.rules).int64 = {gte: 0}];
+  HistoryTime time = 2;
+  int64 start_time = 3 [(validate.rules).int64 = {gt: 0}];
+  int64 end_time = 4 [(validate.rules).int64 = {gt: 0}];
+}
+
+message CreateHistoryOfUserResponse {
+  int64 code = 1;
+  string message = 2;
+}
