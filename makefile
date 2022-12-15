@@ -5,3 +5,8 @@ update:
 	go mod vendor
 init:
 	sh ./init.sh
+
+help:
+	echo "gen-api-proto: create go file for proto file"
+	echo "update: update repo after code changes"
+	echo "init: create service folder and sample file"

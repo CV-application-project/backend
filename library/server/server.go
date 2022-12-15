@@ -28,6 +28,7 @@ func New(opts ...Option) (*Server, error) {
 
 	conn, err := grpc.Dial(cfg.Grpc.Addr.String(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(512*1024*1024), grpc.MaxCallSendMsgSize(512*1024*1024)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("fail to dial gRPC server. %w", err)
@@ -66,7 +67,6 @@ func (s *Server) Serve() error {
 	// shutdown
 	for {
 		select {
-		//goland:noinspection GoDeferInLoop
 		case <-stop:
 			log.Println("Shutting down server")
 

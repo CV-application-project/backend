@@ -16,6 +16,7 @@ type Service struct {
 	cfg        *config.Config
 	store      store.Querier
 	userClient client.UserClient
+	cvClient   client.CVClient
 	api.UnimplementedGatewayServiceServer
 }
 
@@ -36,11 +37,16 @@ func NewService(logger logr.Logger, store store.Querier, cfg *config.Config) *Se
 	if err != nil {
 		userClient = nil
 	}
+	cvClient, err := client.NewCVClient(logger, cfg.ClientHost.CVService)
+	if err != nil {
+		cvClient = nil
+	}
 	return &Service{
 		cfg:        cfg,
 		log:        logger,
 		store:      store,
 		userClient: userClient,
+		cvClient:   cvClient,
 	}
 }
 

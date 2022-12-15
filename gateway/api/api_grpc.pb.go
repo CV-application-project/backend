@@ -25,6 +25,7 @@ type GatewayServiceClient interface {
 	RegisterNewUser(ctx context.Context, in *RegisterNewUserRequest, opts ...grpc.CallOption) (*RegisterNewUserResponse, error)
 	AuthorizeUser(ctx context.Context, in *AuthorizeUserRequest, opts ...grpc.CallOption) (*AuthorizeUserResponse, error)
 	UpdateCitizenIdentityCard(ctx context.Context, in *UpdateCitizenIdentityCardRequest, opts ...grpc.CallOption) (*UpdateCitizenIdentityCardResponse, error)
+	RegisterCICForUser(ctx context.Context, in *RegisterCICForUserRequest, opts ...grpc.CallOption) (*RegisterCICForUserResponse, error)
 }
 
 type gatewayServiceClient struct {
@@ -62,6 +63,15 @@ func (c *gatewayServiceClient) UpdateCitizenIdentityCard(ctx context.Context, in
 	return out, nil
 }
 
+func (c *gatewayServiceClient) RegisterCICForUser(ctx context.Context, in *RegisterCICForUserRequest, opts ...grpc.CallOption) (*RegisterCICForUserResponse, error) {
+	out := new(RegisterCICForUserResponse)
+	err := c.cc.Invoke(ctx, "/gateway.api.GatewayService/RegisterCICForUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GatewayServiceServer is the server API for GatewayService service.
 // All implementations must embed UnimplementedGatewayServiceServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type GatewayServiceServer interface {
 	RegisterNewUser(context.Context, *RegisterNewUserRequest) (*RegisterNewUserResponse, error)
 	AuthorizeUser(context.Context, *AuthorizeUserRequest) (*AuthorizeUserResponse, error)
 	UpdateCitizenIdentityCard(context.Context, *UpdateCitizenIdentityCardRequest) (*UpdateCitizenIdentityCardResponse, error)
+	RegisterCICForUser(context.Context, *RegisterCICForUserRequest) (*RegisterCICForUserResponse, error)
 	mustEmbedUnimplementedGatewayServiceServer()
 }
 
@@ -84,6 +95,9 @@ func (UnimplementedGatewayServiceServer) AuthorizeUser(context.Context, *Authori
 }
 func (UnimplementedGatewayServiceServer) UpdateCitizenIdentityCard(context.Context, *UpdateCitizenIdentityCardRequest) (*UpdateCitizenIdentityCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCitizenIdentityCard not implemented")
+}
+func (UnimplementedGatewayServiceServer) RegisterCICForUser(context.Context, *RegisterCICForUserRequest) (*RegisterCICForUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterCICForUser not implemented")
 }
 func (UnimplementedGatewayServiceServer) mustEmbedUnimplementedGatewayServiceServer() {}
 
@@ -152,6 +166,24 @@ func _GatewayService_UpdateCitizenIdentityCard_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GatewayService_RegisterCICForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterCICForUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayServiceServer).RegisterCICForUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gateway.api.GatewayService/RegisterCICForUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayServiceServer).RegisterCICForUser(ctx, req.(*RegisterCICForUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GatewayService_ServiceDesc is the grpc.ServiceDesc for GatewayService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +202,10 @@ var GatewayService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateCitizenIdentityCard",
 			Handler:    _GatewayService_UpdateCitizenIdentityCard_Handler,
+		},
+		{
+			MethodName: "RegisterCICForUser",
+			Handler:    _GatewayService_RegisterCICForUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

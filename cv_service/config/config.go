@@ -9,24 +9,17 @@ import (
 	"strings"
 )
 
-type ClientHost struct {
-	UserService string `json:"user_service" mapstructure:"user_service"`
-	CVService   string `json:"cv_service" mapstructure:"cv_service"`
-}
-
 type Config struct {
 	database.Base   `mapstructure:",squash"`
-	MySQL           database.DBConfig `json:"mysql" yaml:"mysql" mapstructure:"mysql"`
-	ClientHost      ClientHost        `json:"client_host" mapstructure:"client_host"`
-	MigrationFolder string            `json:"migration_folder" yaml:"migration_folder" mapstructure:"migration_folder"`
+	MySQL           database.DBConfig `json:"mysql" mapstructure:"mysql"`
+	MigrationFolder string            `json:"migration_folder" mapstructure:"migration_folder"`
 }
 
 func loadDefaultConfig() *Config {
 	return &Config{
 		Base:            *database.DefaultBaseConfig(),
 		MySQL:           database.MySQLDefaultConfig(),
-		ClientHost:      ClientHost{},
-		MigrationFolder: "file://gateway/sql/migrations",
+		MigrationFolder: "file://user_service/sql/migrations",
 	}
 }
 
@@ -35,7 +28,7 @@ func Load() (*Config, error) {
 
 	viper.SetConfigType("json")
 	viper.AddConfigPath(".")
-	viper.AddConfigPath("./gateway")
+	viper.AddConfigPath("./cv_service")
 	viper.SetConfigName("config")
 
 	err := viper.ReadInConfig()
@@ -52,7 +45,6 @@ func Load() (*Config, error) {
 			return nil, err
 		}
 	}
-
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "__"))
 
 	viper.AutomaticEnv()

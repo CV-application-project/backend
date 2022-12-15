@@ -57,9 +57,6 @@ func newGatewayServer(c *httpConfig, conn *grpc.ClientConn, servers []ServiceSer
 	}
 
 	httpMux.Handle("/", handler)
-	for _, h := range c.ServerHandlers {
-		h(httpMux)
-	}
 
 	svr := &http.Server{
 		Addr:    c.Addr.String(),

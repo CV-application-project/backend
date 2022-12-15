@@ -10,13 +10,13 @@ import "timekeeping_service/api/data.proto";
 service TimekeepingService {
   rpc GetHistoryOfUser(GetHistoryOfUserRequest) returns (GetHistoryOfUserResponse) {
     option (google.api.http) = {
-      post: "/v1/timekeeping/history",
+      post: "/api/v1/timekeeping/history",
       body: "*"
     };
   }
   rpc CreateHistoryOfUser(CreateHistoryOfUserRequest) returns (CreateHistoryOfUserResponse) {
     option (google.api.http) = {
-      post: "/v1/timekeeping/create",
+      post: "/api/v1/timekeeping/create",
       body: "*"
     };
   }

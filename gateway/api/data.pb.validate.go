@@ -286,71 +286,29 @@ func (m *CitizenIdentityCard) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UserID
+	// no validation rules for Id
 
-	if t := m.GetRegisterDate(); t != nil {
-		ts, err := t.AsTime(), t.CheckValid()
-		if err != nil {
-			return CitizenIdentityCardValidationError{
-				field:  "RegisterDate",
-				reason: "value is not a valid timestamp",
-				cause:  err,
-			}
+	if m.GetRegisterDate() <= 0 {
+		return CitizenIdentityCardValidationError{
+			field:  "RegisterDate",
+			reason: "value must be greater than 0",
 		}
-
-		gt := time.Unix(0, 0)
-
-		if ts.Sub(gt) <= 0 {
-			return CitizenIdentityCardValidationError{
-				field:  "RegisterDate",
-				reason: "value must be greater than 1970-01-01 00:00:00 +0000 UTC",
-			}
-		}
-
 	}
 
-	if t := m.GetExpireDate(); t != nil {
-		ts, err := t.AsTime(), t.CheckValid()
-		if err != nil {
-			return CitizenIdentityCardValidationError{
-				field:  "ExpireDate",
-				reason: "value is not a valid timestamp",
-				cause:  err,
-			}
+	if m.GetExpireDate() <= 0 {
+		return CitizenIdentityCardValidationError{
+			field:  "ExpireDate",
+			reason: "value must be greater than 0",
 		}
-
-		now := time.Now()
-
-		if ts.Sub(now) <= 0 {
-			return CitizenIdentityCardValidationError{
-				field:  "ExpireDate",
-				reason: "value must be greater than now",
-			}
-		}
-
 	}
 
 	// no validation rules for Provider
 
-	if t := m.GetBorn(); t != nil {
-		ts, err := t.AsTime(), t.CheckValid()
-		if err != nil {
-			return CitizenIdentityCardValidationError{
-				field:  "Born",
-				reason: "value is not a valid timestamp",
-				cause:  err,
-			}
+	if m.GetBorn() <= 0 {
+		return CitizenIdentityCardValidationError{
+			field:  "Born",
+			reason: "value must be greater than 0",
 		}
-
-		now := time.Now()
-
-		if ts.Sub(now) >= 0 {
-			return CitizenIdentityCardValidationError{
-				field:  "Born",
-				reason: "value must be less than now",
-			}
-		}
-
 	}
 
 	return nil
@@ -638,3 +596,218 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AuthorizeUserResponseValidationError{}
+
+// Validate checks the field values on RegisterCICForUserRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RegisterCICForUserRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetUserId() <= 0 {
+		return RegisterCICForUserRequestValidationError{
+			field:  "UserId",
+			reason: "value must be greater than 0",
+		}
+	}
+
+	// no validation rules for Front
+
+	// no validation rules for Back
+
+	return nil
+}
+
+// RegisterCICForUserRequestValidationError is the validation error returned by
+// RegisterCICForUserRequest.Validate if the designated constraints aren't met.
+type RegisterCICForUserRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RegisterCICForUserRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RegisterCICForUserRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RegisterCICForUserRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RegisterCICForUserRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RegisterCICForUserRequestValidationError) ErrorName() string {
+	return "RegisterCICForUserRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RegisterCICForUserRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRegisterCICForUserRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RegisterCICForUserRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RegisterCICForUserRequestValidationError{}
+
+// Validate checks the field values on Image with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *Image) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Data
+
+	return nil
+}
+
+// ImageValidationError is the validation error returned by Image.Validate if
+// the designated constraints aren't met.
+type ImageValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ImageValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ImageValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ImageValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ImageValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ImageValidationError) ErrorName() string { return "ImageValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ImageValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sImage.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ImageValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ImageValidationError{}
+
+// Validate checks the field values on RegisterCICForUserResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RegisterCICForUserResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	return nil
+}
+
+// RegisterCICForUserResponseValidationError is the validation error returned
+// by RegisterCICForUserResponse.Validate if the designated constraints aren't met.
+type RegisterCICForUserResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RegisterCICForUserResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RegisterCICForUserResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RegisterCICForUserResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RegisterCICForUserResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RegisterCICForUserResponseValidationError) ErrorName() string {
+	return "RegisterCICForUserResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RegisterCICForUserResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRegisterCICForUserResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RegisterCICForUserResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RegisterCICForUserResponseValidationError{}

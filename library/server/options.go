@@ -2,7 +2,7 @@ package server
 
 import "net/http"
 
-type HTTPServerHandler func(http.Handler) http.Handler
+type HTTPServerHandler func(*http.ServeMux)
 type HTTPServerMiddleware func(http.Handler) http.Handler
 
 func WithGrpcAddrListen(l Listen) Option {

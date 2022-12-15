@@ -10,13 +10,13 @@ import "user_service/api/data.proto";
 service UserService {
   rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse) {
     option (google.api.http) = {
-      post: "/v1/register",
+      post: "/api/v1/register",
       body: "*"
     };
   }
   rpc AuthorizeUser(AuthorizeUserRequest) returns (AuthorizeUserResponse) {
     option (google.api.http) = {
-      post: "/v1/authorize",
+      post: "/api/v1/authorize",
       body: "*"
     };
   }

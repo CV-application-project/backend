@@ -5,7 +5,6 @@ option go_package = "../api";
 // ---------------------------------------------------------------------------------------
 
 import "library/envoyproxy/validate/validate.proto";
-import "google/protobuf/timestamp.proto";
 
 message RegisterNewUserRequest {
   string username = 1 [(validate.rules).string = {min_len:1, max_len:50}];
@@ -25,10 +24,10 @@ message UpdateCitizenIdentityCardResponse {
 
 message CitizenIdentityCard {
   string id = 1;
-  google.protobuf.Timestamp register_date = 2 [(validate.rules).timestamp = {gt:{seconds:0}}];
-  google.protobuf.Timestamp expire_date = 3 [(validate.rules).timestamp = {gt_now:true}];
+  int64 register_date = 2 [(validate.rules).int64 = {gt:0}];
+  int64 expire_date = 3 [(validate.rules).int64 = {gt:0}];
   string provider = 4;
-  google.protobuf.Timestamp born = 5 [(validate.rules).timestamp = {lt_now:true}];
+  int64 born = 5 [(validate.rules).int64 = {gt:0}];
 }
 
 message RegisterNewUserResponse {
@@ -46,4 +45,19 @@ message AuthorizeUserResponse {
   int64 code = 1;
   string message = 2;
   string token = 3;
+}
+
+message RegisterCICForUserRequest {
+  int64 user_id = 1 [(validate.rules).int64 = {gt: 0}];
+  bytes front = 2;
+  bytes back = 3;
+}
+
+message Image {
+  bytes data = 1;
+}
+
+message RegisterCICForUserResponse {
+  int64 code = 1;
+  string message = 2;
 }

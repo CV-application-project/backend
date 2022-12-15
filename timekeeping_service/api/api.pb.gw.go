@@ -230,9 +230,9 @@ func RegisterTimekeepingServiceHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_TimekeepingService_GetHistoryOfUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "timekeeping", "history"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_TimekeepingService_GetHistoryOfUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "timekeeping", "history"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_TimekeepingService_CreateHistoryOfUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"v1", "timekeeping", "create"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_TimekeepingService_CreateHistoryOfUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "timekeeping", "create"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

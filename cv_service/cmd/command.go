@@ -11,17 +11,17 @@ func serverAction(cliCtx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
 	s, err := server.New(
 		server.WithGrpcAddrListen(cfg.Server.GRPC),
 		server.WithHttpAddrListen(cfg.Server.HTTP),
-		server.WithGatewayServerHandler(service.HTTPHandler),
 		server.WithServiceServer(service),
 	)
 	if err != nil {
 		return err
 	}
 	if err := s.Serve(); err != nil {
-		return fmt.Errorf("Error start servers. %w", err)
+		return fmt.Errorf("error start servers. %w", err)
 	}
 	return nil
 }

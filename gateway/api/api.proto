@@ -10,19 +10,25 @@ import "gateway/api/data.proto";
 service GatewayService {
   rpc RegisterNewUser(RegisterNewUserRequest) returns (RegisterNewUserResponse) {
     option (google.api.http) = {
-      post: "/v1/user/register",
+      post: "/api/v1/user/register",
       body: "*"
     };
   }
   rpc AuthorizeUser(AuthorizeUserRequest) returns (AuthorizeUserResponse) {
     option (google.api.http) = {
-      post: "/v1/user/authorize",
+      post: "/api/v1/user/authorize",
       body: "*"
     };
   }
   rpc UpdateCitizenIdentityCard(UpdateCitizenIdentityCardRequest) returns (UpdateCitizenIdentityCardResponse) {
     option (google.api.http) = {
-      post: "/v1/user/citizen-card",
+      post: "/api/v1/user/citizen-card",
+      body: "*"
+    };
+  }
+  rpc RegisterCICForUser(RegisterCICForUserRequest) returns (RegisterCICForUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/cic/register",
       body: "*"
     };
   }
