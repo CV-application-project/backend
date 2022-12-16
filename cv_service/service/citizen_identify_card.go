@@ -160,6 +160,14 @@ func (s *Service) cicPostProcessing(texts []string) (*api.CitizenIdentityCard, e
 			card.Location = strings.TrimSpace(strings.Join([]string{texts[index+2], temp}, ", "))
 		} else if strings.Contains(text, "Đặc điểm nhân dạng") {
 			card.Provider = strings.TrimSpace(strings.Join([]string{texts[index-2], texts[index-1]}, " "))
+		} else if strings.Contains(text, "Ngày ") {
+			arr := strings.Split(text, " ")
+			date := strings.Join([]string{arr[1], arr[3], arr[5]}, "/")
+			dateTime, err := convertToTime(strings.ReplaceAll(date, "Ø", "0"))
+			if err != nil {
+				return nil, err
+			}
+			card.RegisterDate = dateTime
 		}
 	}
 	for _, imageFile := range imageList {
@@ -187,4 +195,23 @@ func convertToTime(timeString string) (int64, error) {
 		return 0, err
 	}
 	return finalTimeTime.Unix(), nil
+}
+
+func (s *Service) GetCICByUserId(ctx context.Context, req *api.GetCICByUserIdRequest) (*api.GetCICByUserIdResponse, error) {
+	logger := s.log.WithName("GetCICByUserId").WithValues("userId", req.UserId)
+	cic, err := s.store.GetCICByUserId(ctx, req.UserId)
+	if err != nil {
+		logger.Error(err, "Store | GetCICByUserId")
+		return nil, err
+	}
+	var card api.CitizenIdentityCard
+	if err = json.Unmarshal([]byte(cic.Data.String), &card); err != nil {
+		logger.Error(err, "json | Unmarshal")
+		return nil, err
+	}
+
+	return &api.GetCICByUserIdResponse{
+		UserId: req.UserId,
+		Card:   &card,
+	}, nil
 }
