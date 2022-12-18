@@ -41,11 +41,7 @@ message CitizenIdentityCard {
 
 message RegisterUserFaceRequest {
   int64 user_id = 1 [(validate.rules).int64 = {gt: 0}];
-  repeated Image images = 2;
-}
-
-message Image {
-  bytes data = 1;
+  bytes image = 2 [(validate.rules).bytes = {ignore_empty: false, min_len: 0}];
 }
 
 message RegisterUserFaceResponse {
@@ -54,7 +50,8 @@ message RegisterUserFaceResponse {
 }
 
 message AuthorizeUserFaceRequest {
-  bytes image = 1 [(validate.rules).bytes = {ignore_empty: false, min_len: 0}];
+  int64 user_id = 1 [(validate.rules).int64 = {gt: 0}];
+  bytes image = 2 [(validate.rules).bytes = {ignore_empty: false, min_len: 0}];
 }
 
 message AuthorizeUserFaceResponse {

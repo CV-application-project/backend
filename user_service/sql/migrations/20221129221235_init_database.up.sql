@@ -3,7 +3,7 @@ create table if not exists user
     `id`         bigint auto_increment primary key,
     `name`       nvarchar(255) not null,
     `username`   nvarchar(255) not null,
-    `password`   blob          not null COLLATE utf8mb4_general_ci,
+    `password`   text          not null COLLATE utf8mb4_general_ci,
     `data`       text COLLATE utf8mb4_general_ci,
     `created_at` timestamp     not null default now(),
     `updated_at` timestamp     not null default now() on update now()

@@ -16,7 +16,6 @@ type Querier interface {
 	GetUserInfoById(ctx context.Context, id int64) (User, error)
 	GetUserTokenByUserId(ctx context.Context, userID int64) (UserToken, error)
 	UpdateUserInfoById(ctx context.Context, arg UpdateUserInfoByIdParams) (sql.Result, error)
-	Close() error
 }
 
 var _ Querier = (*Queries)(nil)
