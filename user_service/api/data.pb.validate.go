@@ -220,15 +220,7 @@ func (m *UserToken) Validate() error {
 
 	// no validation rules for Token
 
-	if v, ok := interface{}(m.GetExpiredAt()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return UserTokenValidationError{
-				field:  "ExpiredAt",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for ExpiredAt
 
 	return nil
 }

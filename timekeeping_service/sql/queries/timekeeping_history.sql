@@ -33,3 +33,7 @@ where `user_id` = ?
   and `month` = ?
   and `year` = ?
   and is_active = true;
+
+/* name: GetTimekeepingHistoryByDuration :many */
+select * from timekeeping_history
+where `user_id` = ? and `created_at` between ? and ?

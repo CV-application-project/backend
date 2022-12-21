@@ -6,8 +6,8 @@ import (
 	"Backend-Server/user_service/store"
 	"context"
 	"database/sql"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 )
@@ -30,10 +30,17 @@ func (s *Service) RegisterUser(ctx context.Context, req *api.RegisterUserRequest
 		}
 		logger.Info("There is no user with this username and email")
 		// Case user doesn't exist
+
+		hashPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), constant.PasswordCost)
+		if err != nil {
+			logger.Error(err, "bcrypt | GenerateFromPassword | Can not hash password")
+			return nil, err
+		}
+
 		insertResult, err := s.store.CreateNewUserInfo(ctx, store.CreateNewUserInfoParams{
 			Name:     req.Name,
 			Username: req.Username,
-			Password: req.Password,
+			Password: string(hashPassword),
 			Email:    req.Email,
 			Data:     sql.NullString{Valid: false, String: ""},
 		})
@@ -62,12 +69,9 @@ func (s *Service) RegisterUser(ctx context.Context, req *api.RegisterUserRequest
 			Code:    http.StatusOK,
 			Message: "Register new user successfully",
 			Data: &api.UserToken{
-				UserId: tokenParam.UserID,
-				Token:  tokenParam.Token,
-				ExpiredAt: &timestamp.Timestamp{
-					Seconds: tokenParam.ExpiredAt.Unix(),
-					Nanos:   0,
-				},
+				UserId:    tokenParam.UserID,
+				Token:     tokenParam.Token,
+				ExpiredAt: tokenParam.ExpiredAt.Unix(),
 			},
 		}, nil
 	}
@@ -76,5 +80,45 @@ func (s *Service) RegisterUser(ctx context.Context, req *api.RegisterUserRequest
 		Code:    http.StatusOK,
 		Message: "User already exists",
 		Data:    nil,
+	}, nil
+}
+
+func (s *Service) AuthorizeUser(ctx context.Context, req *api.AuthorizeUserRequest) (*api.AuthorizeUserResponse, error) {
+	traceId := ""
+	if req.Username != "" {
+		traceId = req.Username
+	} else if req.Email != "" {
+		traceId = req.Email
+	}
+	logger := s.log.WithName("AuthorizeUser").WithValues("userId", traceId)
+
+	user, err := s.store.GetUserByUsernameOrEmail(ctx, store.GetUserByUsernameOrEmailParams{
+		Username: req.Username,
+		Email:    req.Email,
+	})
+	if err != nil {
+		logger.Error(err, "Store | GetUserByUsernameOrEmail")
+		return nil, err
+	}
+
+	// Validate password
+	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		logger.Error(err, "bcrypt | CompareHashAndPassword")
+		return nil, err
+	}
+
+	token, err := s.store.GetUserTokenByUserId(ctx, user.ID)
+	if err != nil {
+		logger.Error(err, "Store | GetUserTokenByUserId")
+		return nil, err
+	}
+	return &api.AuthorizeUserResponse{
+		Code:    http.StatusOK,
+		Message: "success",
+		Data: &api.UserToken{
+			UserId:    token.UserID,
+			Token:     token.Token,
+			ExpiredAt: token.ExpiredAt.Unix(),
+		},
 	}, nil
 }

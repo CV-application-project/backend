@@ -47,7 +47,7 @@ func (h *AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) HTTPHandler(httpMux *http.ServeMux) {
-	handler := New(s.corsMiddleware)
+	handler := New(s.authenticationMiddleware, s.corsMiddleware)
 	httpMux.Handle("/cic/register", handler.Build(s.HTTPRegisterCICForUser))
 	httpMux.Handle("/face/register", handler.Build(s.HTTPRegisterNewUserFace))
 	httpMux.Handle("/face/authorize", handler.Build(s.HTTPAuthorizeNewUserFace))

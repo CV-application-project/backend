@@ -10,6 +10,7 @@ import (
 
 type UserClient interface {
 	RegisterUser(ctx context.Context, req *api.RegisterUserRequest) (*api.RegisterUserResponse, error)
+	AuthorizeUser(ctx context.Context, req *api.AuthorizeUserRequest) (*api.AuthorizeUserResponse, error)
 }
 
 type userClient struct {
@@ -30,4 +31,8 @@ func NewUserClient(logger logr.Logger, addr string) (UserClient, error) {
 
 func (c *userClient) RegisterUser(ctx context.Context, req *api.RegisterUserRequest) (*api.RegisterUserResponse, error) {
 	return c.client.RegisterUser(ctx, req)
+}
+
+func (c *userClient) AuthorizeUser(ctx context.Context, req *api.AuthorizeUserRequest) (*api.AuthorizeUserResponse, error) {
+	return c.client.AuthorizeUser(ctx, req)
 }

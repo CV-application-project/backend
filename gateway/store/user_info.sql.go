@@ -88,7 +88,8 @@ func (q *Queries) GetUserInfoByUsernameOrEmail(ctx context.Context, arg GetUserI
 
 const updateUserInfoTokenByUserId = `-- name: UpdateUserInfoTokenByUserId :execresult
 update user_info
-set token = ? and expired_at = ?
+set token      = ?,
+    expired_at = ?
 where user_id = ?
 `
 

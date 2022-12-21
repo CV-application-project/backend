@@ -12,6 +12,7 @@ import (
 type Querier interface {
 	CreateTimekeepingHistory(ctx context.Context, arg CreateTimekeepingHistoryParams) (sql.Result, error)
 	GetTimekeepingHistoryAtMonthByUserId(ctx context.Context, arg GetTimekeepingHistoryAtMonthByUserIdParams) ([]TimekeepingHistory, error)
+	GetTimekeepingHistoryByDuration(ctx context.Context, arg GetTimekeepingHistoryByDurationParams) ([]TimekeepingHistory, error)
 	GetTimekeepingHistoryInDayByUserId(ctx context.Context, arg GetTimekeepingHistoryInDayByUserIdParams) (TimekeepingHistory, error)
 	GetTimekeepingHistoryInYearByUserId(ctx context.Context, arg GetTimekeepingHistoryInYearByUserIdParams) ([]TimekeepingHistory, error)
 	UpdateTimekeepingHistoryInDay(ctx context.Context, arg UpdateTimekeepingHistoryInDayParams) (sql.Result, error)

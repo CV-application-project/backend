@@ -207,23 +207,16 @@ func (m *HistoryTime) Validate() error {
 		return nil
 	}
 
-	if val := m.GetDay(); val < 0 || val >= 32 {
+	if m.GetFrom() <= 0 {
 		return HistoryTimeValidationError{
-			field:  "Day",
-			reason: "value must be inside range [0, 32)",
+			field:  "From",
+			reason: "value must be greater than 0",
 		}
 	}
 
-	if val := m.GetMonth(); val < 0 || val >= 13 {
+	if m.GetTo() <= 0 {
 		return HistoryTimeValidationError{
-			field:  "Month",
-			reason: "value must be inside range [0, 13)",
-		}
-	}
-
-	if m.GetYear() <= 0 {
-		return HistoryTimeValidationError{
-			field:  "Year",
+			field:  "To",
 			reason: "value must be greater than 0",
 		}
 	}
@@ -482,16 +475,6 @@ func (m *CreateHistoryOfUserRequest) Validate() error {
 		return CreateHistoryOfUserRequestValidationError{
 			field:  "UserId",
 			reason: "value must be greater than or equal to 0",
-		}
-	}
-
-	if v, ok := interface{}(m.GetTime()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CreateHistoryOfUserRequestValidationError{
-				field:  "Time",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
 		}
 	}
 

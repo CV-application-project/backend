@@ -55,6 +55,11 @@ func (s *Service) HTTPRegisterCICForUser(res http.ResponseWriter, req *http.Requ
 	}
 	defer frontImageFile.Close()
 	userId := strings.Split(header.Filename, "_")[0]
+	userIdInt := cast.ToInt64(userId)
+	if userIdInt != req.Context().Value(ContextUserId) {
+		err = errors.New("wrong user")
+		return err
+	}
 	logger.WithValues("user_id", userId)
 	frontData := bytes.NewBuffer(nil)
 	if _, err = io.Copy(frontData, frontImageFile); err != nil {
@@ -73,7 +78,7 @@ func (s *Service) HTTPRegisterCICForUser(res http.ResponseWriter, req *http.Requ
 		return err
 	}
 	resp, err := s.RegisterCICForUser(context.Background(), &api.RegisterCICForUserRequest{
-		UserId: cast.ToInt64(userId),
+		UserId: userIdInt,
 		Front:  frontData.Bytes(),
 		Back:   backData.Bytes(),
 	})

@@ -18,9 +18,8 @@ message GetHistoryOfUserResponse {
 }
 
 message HistoryTime {
-  uint32 day = 1 [(validate.rules).uint32 = {gte: 0, lt: 32}];
-  uint32 month = 2 [(validate.rules).uint32 = {gte: 0, lt: 13}];
-  uint32 year = 3 [(validate.rules).uint32 = {gt: 0}];
+  int64 from = 1 [(validate.rules).int64 = {gt: 0}];
+  int64 to = 2 [(validate.rules).int64 = {gt: 0}];
 }
 
 message TimekeepingHistory {
@@ -45,7 +44,6 @@ message Data {
 
 message CreateHistoryOfUserRequest {
   int64 user_id = 1[(validate.rules).int64 = {gte: 0}];
-  HistoryTime time = 2;
   int64 start_time = 3 [(validate.rules).int64 = {gt: 0}];
   int64 end_time = 4 [(validate.rules).int64 = {gt: 0}];
 }

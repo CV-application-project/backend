@@ -13,7 +13,8 @@ where token = ?
 
 /* name: UpdateUserInfoTokenByUserId :execresult */
 update user_info
-set token = ? and expired_at = ?
+set token      = ?,
+    expired_at = ?
 where user_id = ?;
 
 /* name: CreateUserInfo :execresult */

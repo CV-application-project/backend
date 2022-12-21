@@ -31,7 +31,7 @@ func createBearerToken(tokenInfo *api.UserToken) (*BearerToken, error) {
 	claims := &jwtCustomClaim{
 		tokenInfo.UserId,
 		jwt.StandardClaims{
-			ExpiresAt: currentTime.Add(time.Hour * 24).Unix(),
+			ExpiresAt: tokenInfo.ExpiredAt,
 			Issuer:    "admin",
 			IssuedAt:  currentTime.Unix(),
 		},
@@ -43,6 +43,6 @@ func createBearerToken(tokenInfo *api.UserToken) (*BearerToken, error) {
 	}
 	return &BearerToken{
 		Token:     finalToken,
-		ExpiredAt: currentTime,
+		ExpiredAt: time.Unix(tokenInfo.ExpiredAt, 0),
 	}, err
 }

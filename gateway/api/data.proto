@@ -37,8 +37,9 @@ message RegisterNewUserResponse {
 }
 
 message AuthorizeUserRequest {
-  string username = 1 [(validate.rules).string = {min_len:1, max_len:50}];
-  string password = 2 [(validate.rules).string = {min_len:8, max_len:255}];
+  string email = 1;
+  string username = 2;
+  string password = 3 [(validate.rules).string = {min_len:8, max_len:255}];
 }
 
 message AuthorizeUserResponse {

@@ -2,13 +2,14 @@ package service
 
 import (
 	"Backend-Server/gateway/api"
-	"Backend-Server/gateway/constant"
 	"Backend-Server/gateway/store"
 	userApi "Backend-Server/user_service/api"
 	"context"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
+	"time"
 )
+
+const TimeOneDay = 24 * time.Hour
 
 func (s *Service) RegisterNewUser(ctx context.Context, req *api.RegisterNewUserRequest) (*api.RegisterNewUserResponse, error) {
 	logger := s.log.WithName("RegisterNewUser")
@@ -17,17 +18,11 @@ func (s *Service) RegisterNewUser(ctx context.Context, req *api.RegisterNewUserR
 		return nil, err
 	}
 
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), constant.PasswordCost)
-	if err != nil {
-		logger.Error(err, "bcrypt | GenerateFromPassword | Can not hash password")
-		return nil, err
-	}
-
 	userReq := &userApi.RegisterUserRequest{
 		Username: req.Username,
 		Name:     req.Name,
 		Email:    req.Email,
-		Password: string(hashPassword),
+		Password: req.Password,
 	}
 
 	// Send request to User service
@@ -63,13 +58,52 @@ func (s *Service) RegisterNewUser(ctx context.Context, req *api.RegisterNewUserR
 
 func (s *Service) AuthorizeUser(ctx context.Context, req *api.AuthorizeUserRequest) (*api.AuthorizeUserResponse, error) {
 	logger := s.log.WithName("AuthorizeUser")
-	if err := req.Validate(); err != nil {
-		logger.Error(err, "Validate request failed")
+
+	user, err := s.store.GetUserInfoByUsernameOrEmail(ctx, store.GetUserInfoByUsernameOrEmailParams{
+		Username: req.Username,
+		Email:    req.Email,
+	})
+	if err != nil {
+		logger.Error(err, "Store | GetUserInfoByUsernameOrEmail")
 		return nil, err
 	}
+
+	authorizeResp, err := s.userClient.AuthorizeUser(ctx, &userApi.AuthorizeUserRequest{
+		Username: user.Username,
+		Email:    user.Email,
+		Password: req.Password,
+	})
+	if err != nil {
+		logger.Error(err, "userClient | AuthorizeUser")
+		return nil, err
+	}
+
+	if user.ExpiredAt.After(time.Now().Add(TimeOneDay)) {
+		return &api.AuthorizeUserResponse{
+			Code:    http.StatusOK,
+			Message: "success",
+			Token:   user.Token,
+		}, nil
+	}
+
+	userToken, err := createBearerToken(authorizeResp.Data)
+	if err != nil {
+		logger.Error(err, "createBearerToken | can not create Bearer token")
+		return nil, err
+	}
+
+	if _, err = s.store.UpdateUserInfoTokenByUserId(ctx, store.UpdateUserInfoTokenByUserIdParams{
+		UserID:    user.UserID,
+		Token:     userToken.Token,
+		ExpiredAt: userToken.ExpiredAt,
+	}); err != nil {
+		logger.Error(err, "Store | UpdateUserInfoTokenByUserId")
+		return nil, err
+	}
+
 	return &api.AuthorizeUserResponse{
 		Code:    http.StatusOK,
-		Message: "Authorize user successfully",
-		Token:   "Chua co dau",
+		Message: "success",
+		Token:   "Bearer " + userToken.Token,
 	}, nil
 }

@@ -5,7 +5,6 @@ option go_package = "../api";
 // ---------------------------------------------------------------------------------------
 
 import "library/envoyproxy/validate/validate.proto";
-import "google/protobuf/timestamp.proto";
 
 message RegisterUserRequest {
   string username = 1 [(validate.rules).string = {min_len:1, max_len:50}];
@@ -23,7 +22,7 @@ message RegisterUserResponse {
 message UserToken {
   int64 user_id = 1;
   string token = 2;
-  google.protobuf.Timestamp expired_at = 3;
+  int64 expired_at = 3;
 }
 
 message AuthorizeUserRequest {

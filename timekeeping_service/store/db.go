@@ -30,6 +30,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getTimekeepingHistoryAtMonthByUserIdStmt, err = db.PrepareContext(ctx, getTimekeepingHistoryAtMonthByUserId); err != nil {
 		return nil, fmt.Errorf("error preparing query GetTimekeepingHistoryAtMonthByUserId: %w", err)
 	}
+	if q.getTimekeepingHistoryByDurationStmt, err = db.PrepareContext(ctx, getTimekeepingHistoryByDuration); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTimekeepingHistoryByDuration: %w", err)
+	}
 	if q.getTimekeepingHistoryInDayByUserIdStmt, err = db.PrepareContext(ctx, getTimekeepingHistoryInDayByUserId); err != nil {
 		return nil, fmt.Errorf("error preparing query GetTimekeepingHistoryInDayByUserId: %w", err)
 	}
@@ -52,6 +55,11 @@ func (q *Queries) Close() error {
 	if q.getTimekeepingHistoryAtMonthByUserIdStmt != nil {
 		if cerr := q.getTimekeepingHistoryAtMonthByUserIdStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getTimekeepingHistoryAtMonthByUserIdStmt: %w", cerr)
+		}
+	}
+	if q.getTimekeepingHistoryByDurationStmt != nil {
+		if cerr := q.getTimekeepingHistoryByDurationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTimekeepingHistoryByDurationStmt: %w", cerr)
 		}
 	}
 	if q.getTimekeepingHistoryInDayByUserIdStmt != nil {
@@ -110,6 +118,7 @@ type Queries struct {
 	tx                                       *sql.Tx
 	createTimekeepingHistoryStmt             *sql.Stmt
 	getTimekeepingHistoryAtMonthByUserIdStmt *sql.Stmt
+	getTimekeepingHistoryByDurationStmt      *sql.Stmt
 	getTimekeepingHistoryInDayByUserIdStmt   *sql.Stmt
 	getTimekeepingHistoryInYearByUserIdStmt  *sql.Stmt
 	updateTimekeepingHistoryInDayStmt        *sql.Stmt
@@ -121,6 +130,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		tx:                                       tx,
 		createTimekeepingHistoryStmt:             q.createTimekeepingHistoryStmt,
 		getTimekeepingHistoryAtMonthByUserIdStmt: q.getTimekeepingHistoryAtMonthByUserIdStmt,
+		getTimekeepingHistoryByDurationStmt:      q.getTimekeepingHistoryByDurationStmt,
 		getTimekeepingHistoryInDayByUserIdStmt:   q.getTimekeepingHistoryInDayByUserIdStmt,
 		getTimekeepingHistoryInYearByUserIdStmt:  q.getTimekeepingHistoryInYearByUserIdStmt,
 		updateTimekeepingHistoryInDayStmt:        q.updateTimekeepingHistoryInDayStmt,

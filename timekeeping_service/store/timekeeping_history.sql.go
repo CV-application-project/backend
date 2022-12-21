@@ -8,6 +8,7 @@ package store
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createTimekeepingHistory = `-- name: CreateTimekeepingHistory :execresult
@@ -50,6 +51,50 @@ type GetTimekeepingHistoryAtMonthByUserIdParams struct {
 
 func (q *Queries) GetTimekeepingHistoryAtMonthByUserId(ctx context.Context, arg GetTimekeepingHistoryAtMonthByUserIdParams) ([]TimekeepingHistory, error) {
 	rows, err := q.query(ctx, q.getTimekeepingHistoryAtMonthByUserIdStmt, getTimekeepingHistoryAtMonthByUserId, arg.UserID, arg.Month, arg.Year)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []TimekeepingHistory{}
+	for rows.Next() {
+		var i TimekeepingHistory
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Day,
+			&i.Month,
+			&i.Year,
+			&i.IsActive,
+			&i.Data,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTimekeepingHistoryByDuration = `-- name: GetTimekeepingHistoryByDuration :many
+select id, user_id, day, month, year, is_active, data, created_at, updated_at from timekeeping_history
+where ` + "`" + `user_id` + "`" + ` = ? and ` + "`" + `created_at` + "`" + ` between ? and ?
+`
+
+type GetTimekeepingHistoryByDurationParams struct {
+	UserID      int64     `json:"user_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	CreatedAt_2 time.Time `json:"created_at_2"`
+}
+
+func (q *Queries) GetTimekeepingHistoryByDuration(ctx context.Context, arg GetTimekeepingHistoryByDurationParams) ([]TimekeepingHistory, error) {
+	rows, err := q.query(ctx, q.getTimekeepingHistoryByDurationStmt, getTimekeepingHistoryByDuration, arg.UserID, arg.CreatedAt, arg.CreatedAt_2)
 	if err != nil {
 		return nil, err
 	}
