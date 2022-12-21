@@ -20,4 +20,10 @@ service TimekeepingService {
       body: "*"
     };
   }
+  rpc UpdateHistoryOfUser(UpdateHistoryOfUserRequest) returns (UpdateHistoryOfUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/timekeeping/update"
+      body: "*"
+    };
+  }
 }

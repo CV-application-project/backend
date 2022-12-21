@@ -24,3 +24,24 @@ func (s *Service) convertToAPIHistory(histories []store.TimekeepingHistory) []*a
 	}
 	return convertedList
 }
+
+func (s *Service) getOption(req *api.UpdateHistoryOfUserRequest) option {
+	if req.StartTime == 0 && req.EndTime == 0 {
+		return TypeUnspecified
+	}
+	if req.StartTime == 0 {
+		return TypeUpdateEndTime
+	}
+	if req.EndTime == 0 {
+		return TypeUpdateStartTime
+	}
+	return TypeUnspecified
+}
+
+func (s *Service) getHistoryData(history store.TimekeepingHistory) *api.Data {
+	var data api.Data
+	if err := json.Unmarshal([]byte(history.Data.String), &data); err != nil {
+		return nil
+	}
+	return &data
+}

@@ -12,11 +12,12 @@ import (
 )
 
 type Service struct {
-	log        logr.Logger
-	cfg        *config.Config
-	store      store.Querier
-	userClient client.UserClient
-	cvClient   client.CVClient
+	log               logr.Logger
+	cfg               *config.Config
+	store             store.Querier
+	userClient        client.UserClient
+	cvClient          client.CVClient
+	timekeepingClient client.TimekeepingClient
 	api.UnimplementedGatewayServiceServer
 }
 
@@ -41,12 +42,17 @@ func NewService(logger logr.Logger, store store.Querier, cfg *config.Config) *Se
 	if err != nil {
 		cvClient = nil
 	}
+	timekeepingClient, err := client.NewTimekeepingClient(logger, cfg.ClientHost.TimekeepingService)
+	if err != nil {
+		timekeepingClient = nil
+	}
 	return &Service{
-		cfg:        cfg,
-		log:        logger,
-		store:      store,
-		userClient: userClient,
-		cvClient:   cvClient,
+		cfg:               cfg,
+		log:               logger,
+		store:             store,
+		userClient:        userClient,
+		cvClient:          cvClient,
+		timekeepingClient: timekeepingClient,
 	}
 }
 

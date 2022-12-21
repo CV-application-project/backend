@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type TimekeepingServiceClient interface {
 	GetHistoryOfUser(ctx context.Context, in *GetHistoryOfUserRequest, opts ...grpc.CallOption) (*GetHistoryOfUserResponse, error)
 	CreateHistoryOfUser(ctx context.Context, in *CreateHistoryOfUserRequest, opts ...grpc.CallOption) (*CreateHistoryOfUserResponse, error)
+	UpdateHistoryOfUser(ctx context.Context, in *UpdateHistoryOfUserRequest, opts ...grpc.CallOption) (*UpdateHistoryOfUserResponse, error)
 }
 
 type timekeepingServiceClient struct {
@@ -52,12 +53,22 @@ func (c *timekeepingServiceClient) CreateHistoryOfUser(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *timekeepingServiceClient) UpdateHistoryOfUser(ctx context.Context, in *UpdateHistoryOfUserRequest, opts ...grpc.CallOption) (*UpdateHistoryOfUserResponse, error) {
+	out := new(UpdateHistoryOfUserResponse)
+	err := c.cc.Invoke(ctx, "/timekeeping_service.api.TimekeepingService/UpdateHistoryOfUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TimekeepingServiceServer is the server API for TimekeepingService service.
 // All implementations must embed UnimplementedTimekeepingServiceServer
 // for forward compatibility
 type TimekeepingServiceServer interface {
 	GetHistoryOfUser(context.Context, *GetHistoryOfUserRequest) (*GetHistoryOfUserResponse, error)
 	CreateHistoryOfUser(context.Context, *CreateHistoryOfUserRequest) (*CreateHistoryOfUserResponse, error)
+	UpdateHistoryOfUser(context.Context, *UpdateHistoryOfUserRequest) (*UpdateHistoryOfUserResponse, error)
 	mustEmbedUnimplementedTimekeepingServiceServer()
 }
 
@@ -70,6 +81,9 @@ func (UnimplementedTimekeepingServiceServer) GetHistoryOfUser(context.Context, *
 }
 func (UnimplementedTimekeepingServiceServer) CreateHistoryOfUser(context.Context, *CreateHistoryOfUserRequest) (*CreateHistoryOfUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateHistoryOfUser not implemented")
+}
+func (UnimplementedTimekeepingServiceServer) UpdateHistoryOfUser(context.Context, *UpdateHistoryOfUserRequest) (*UpdateHistoryOfUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateHistoryOfUser not implemented")
 }
 func (UnimplementedTimekeepingServiceServer) mustEmbedUnimplementedTimekeepingServiceServer() {}
 
@@ -120,6 +134,24 @@ func _TimekeepingService_CreateHistoryOfUser_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TimekeepingService_UpdateHistoryOfUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateHistoryOfUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TimekeepingServiceServer).UpdateHistoryOfUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/timekeeping_service.api.TimekeepingService/UpdateHistoryOfUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TimekeepingServiceServer).UpdateHistoryOfUser(ctx, req.(*UpdateHistoryOfUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TimekeepingService_ServiceDesc is the grpc.ServiceDesc for TimekeepingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +166,10 @@ var TimekeepingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateHistoryOfUser",
 			Handler:    _TimekeepingService_CreateHistoryOfUser_Handler,
+		},
+		{
+			MethodName: "UpdateHistoryOfUser",
+			Handler:    _TimekeepingService_UpdateHistoryOfUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

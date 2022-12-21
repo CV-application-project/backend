@@ -11,6 +11,14 @@ import (
 	"time"
 )
 
+type option string
+
+const (
+	TypeUpdateEndTime   option = "end"
+	TypeUpdateStartTime option = "start"
+	TypeUnspecified     option = "unspecified"
+)
+
 func (s *Service) GetHistoryOfUser(ctx context.Context, req *api.GetHistoryOfUserRequest) (*api.GetHistoryOfUserResponse, error) {
 	logger := s.log.WithName("Service | GetHistoryOfUser").WithValues("traceId", req.UserId)
 	if req.Time.From > req.Time.To {
@@ -39,11 +47,6 @@ func (s *Service) CreateHistoryOfUser(ctx context.Context, req *api.CreateHistor
 		logger.Error(err, "Validate")
 		return nil, err
 	}
-	if req.StartTime > req.EndTime {
-		err = errors.New("invalid time")
-		logger.Error(err, "Invalid time")
-		return nil, err
-	}
 	now := time.Now()
 	if _, err = s.store.GetTimekeepingHistoryInDayByUserId(ctx, store.GetTimekeepingHistoryInDayByUserIdParams{
 		UserID: req.UserId,
@@ -57,14 +60,11 @@ func (s *Service) CreateHistoryOfUser(ctx context.Context, req *api.CreateHistor
 		}
 	}
 	data := &api.Data{
-		TotalTime: uint64(req.EndTime - req.StartTime),
+		TotalTime: 0,
 		StartTime: req.StartTime,
-		EndTime:   req.EndTime,
 		Details: []*api.Data_Line{
 			{
-				Index:     0,
 				StartTime: req.StartTime,
-				EndTime:   req.EndTime,
 			},
 		},
 	}
@@ -84,4 +84,65 @@ func (s *Service) CreateHistoryOfUser(ctx context.Context, req *api.CreateHistor
 		return nil, err
 	}
 	return &api.CreateHistoryOfUserResponse{Code: http.StatusOK, Message: "success"}, nil
+}
+
+func (s *Service) UpdateHistoryOfUser(ctx context.Context, req *api.UpdateHistoryOfUserRequest) (*api.UpdateHistoryOfUserResponse, error) {
+	logger := s.log.WithName("UpdateHistoryOfUser").WithValues("userId", req.UserId)
+	updateOption := s.getOption(req)
+	if updateOption == TypeUnspecified {
+		err := errors.New("invalid time")
+		logger.Error(err, "getOption")
+		return nil, err
+	}
+	now := time.Now()
+	history, err := s.store.GetTimekeepingHistoryInDayByUserId(ctx, store.GetTimekeepingHistoryInDayByUserIdParams{
+		UserID: req.UserId,
+		Day:    int32(now.Day()),
+		Month:  int32(now.Month()),
+		Year:   int32(now.Year()),
+	})
+	if err != nil {
+		logger.Error(err, "Store | GetTimekeepingHistoryInDayByUserId")
+		return nil, err
+	}
+	historyData := s.getHistoryData(history)
+	if historyData == nil {
+		logger.Info("getHistoryData")
+		return nil, errors.New("can not parse history data")
+	}
+	switch updateOption {
+	case TypeUpdateEndTime:
+		nearestStartTime := historyData.Details[len(historyData.Details)-1].StartTime
+		historyData.Details[len(historyData.Details)-1].EndTime = req.EndTime
+		historyData.TotalTime += uint64(req.EndTime - nearestStartTime)
+		historyData.EndTime = req.EndTime
+	case TypeUpdateStartTime:
+		historyData.Details = append(historyData.Details, &api.Data_Line{
+			StartTime: req.StartTime,
+			EndTime:   0,
+		})
+	default:
+		break
+	}
+
+	dataBytes, err := json.Marshal(historyData)
+	if err != nil {
+		logger.Error(err, "Marshal")
+		return nil, err
+	}
+	if _, err = s.store.UpdateTimekeepingHistoryInDay(ctx, store.UpdateTimekeepingHistoryInDayParams{
+		UserID: req.UserId,
+		Day:    int32(now.Day()),
+		Month:  int32(now.Month()),
+		Year:   int32(now.Year()),
+		Data:   sql.NullString{Valid: true, String: string(dataBytes)},
+	}); err != nil {
+		logger.Error(err, "Store | UpdateTimekeepingHistoryInDay")
+		return nil, err
+	}
+	return &api.UpdateHistoryOfUserResponse{
+		Code:      http.StatusOK,
+		Message:   "success",
+		TotalTime: int64(historyData.TotalTime),
+	}, nil
 }

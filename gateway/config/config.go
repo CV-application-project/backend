@@ -10,8 +10,9 @@ import (
 )
 
 type ClientHost struct {
-	UserService string `json:"user_service" mapstructure:"user_service"`
-	CVService   string `json:"cv_service" mapstructure:"cv_service"`
+	UserService        string `json:"user_service" mapstructure:"user_service"`
+	CVService          string `json:"cv_service" mapstructure:"cv_service"`
+	TimekeepingService string `json:"timekeeping_service" mapstructure:"timekeeping_service"`
 }
 
 type Config struct {

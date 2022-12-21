@@ -485,13 +485,6 @@ func (m *CreateHistoryOfUserRequest) Validate() error {
 		}
 	}
 
-	if m.GetEndTime() <= 0 {
-		return CreateHistoryOfUserRequestValidationError{
-			field:  "EndTime",
-			reason: "value must be greater than 0",
-		}
-	}
-
 	return nil
 }
 
@@ -623,14 +616,185 @@ var _ interface {
 	ErrorName() string
 } = CreateHistoryOfUserResponseValidationError{}
 
+// Validate checks the field values on UpdateHistoryOfUserRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpdateHistoryOfUserRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetUserId() <= 0 {
+		return UpdateHistoryOfUserRequestValidationError{
+			field:  "UserId",
+			reason: "value must be greater than 0",
+		}
+	}
+
+	if val := m.GetDay(); val <= 0 || val >= 32 {
+		return UpdateHistoryOfUserRequestValidationError{
+			field:  "Day",
+			reason: "value must be inside range (0, 32)",
+		}
+	}
+
+	if val := m.GetMonth(); val <= 0 || val >= 13 {
+		return UpdateHistoryOfUserRequestValidationError{
+			field:  "Month",
+			reason: "value must be inside range (0, 13)",
+		}
+	}
+
+	if m.GetYear() <= 0 {
+		return UpdateHistoryOfUserRequestValidationError{
+			field:  "Year",
+			reason: "value must be greater than 0",
+		}
+	}
+
+	// no validation rules for StartTime
+
+	// no validation rules for EndTime
+
+	return nil
+}
+
+// UpdateHistoryOfUserRequestValidationError is the validation error returned
+// by UpdateHistoryOfUserRequest.Validate if the designated constraints aren't met.
+type UpdateHistoryOfUserRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateHistoryOfUserRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateHistoryOfUserRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateHistoryOfUserRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateHistoryOfUserRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateHistoryOfUserRequestValidationError) ErrorName() string {
+	return "UpdateHistoryOfUserRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateHistoryOfUserRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateHistoryOfUserRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateHistoryOfUserRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateHistoryOfUserRequestValidationError{}
+
+// Validate checks the field values on UpdateHistoryOfUserResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpdateHistoryOfUserResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	// no validation rules for TotalTime
+
+	return nil
+}
+
+// UpdateHistoryOfUserResponseValidationError is the validation error returned
+// by UpdateHistoryOfUserResponse.Validate if the designated constraints
+// aren't met.
+type UpdateHistoryOfUserResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateHistoryOfUserResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateHistoryOfUserResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateHistoryOfUserResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateHistoryOfUserResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateHistoryOfUserResponseValidationError) ErrorName() string {
+	return "UpdateHistoryOfUserResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateHistoryOfUserResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateHistoryOfUserResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateHistoryOfUserResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateHistoryOfUserResponseValidationError{}
+
 // Validate checks the field values on Data_Line with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *Data_Line) Validate() error {
 	if m == nil {
 		return nil
 	}
-
-	// no validation rules for Index
 
 	// no validation rules for StartTime
 

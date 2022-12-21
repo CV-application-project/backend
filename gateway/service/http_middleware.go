@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -21,7 +20,6 @@ func (s *Service) authenticationMiddleware(next AppHandleFunc) AppHandleFunc {
 			return errors.New("invalid authorization token")
 		}
 		tokenKey = strings.Split(tokenKey, " ")[1]
-		fmt.Printf("Token: %v\n", tokenKey)
 		info, err := s.store.GetUserInfoByToken(ctx, tokenKey)
 		if err != nil {
 			return err

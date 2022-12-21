@@ -35,20 +35,33 @@ message Data {
   int64 start_time = 2;
   int64 end_time = 3;
   message Line {
-    int64 index = 1;
-    int64 start_time = 2;
-    int64 end_time = 3;
+    int64 start_time = 1;
+    int64 end_time = 2;
   }
   repeated Line details = 4;
 }
 
 message CreateHistoryOfUserRequest {
   int64 user_id = 1[(validate.rules).int64 = {gte: 0}];
-  int64 start_time = 3 [(validate.rules).int64 = {gt: 0}];
-  int64 end_time = 4 [(validate.rules).int64 = {gt: 0}];
+  int64 start_time = 2 [(validate.rules).int64 = {gt: 0}];
 }
 
 message CreateHistoryOfUserResponse {
   int64 code = 1;
   string message = 2;
+}
+
+message UpdateHistoryOfUserRequest {
+  int64 user_id = 1 [(validate.rules).int64 = {gt: 0}];
+  uint32 day = 2 [(validate.rules).uint32 = {gt: 0, lt: 32}];
+  uint32 month = 3 [(validate.rules).uint32 = {gt: 0, lt: 13}];
+  uint32 year = 4 [(validate.rules).uint32 = {gt: 0}];
+  int64 start_time = 5;
+  int64 end_time = 6;
+}
+
+message UpdateHistoryOfUserResponse {
+  int64 code = 1;
+  string message = 2;
+  int64 total_time = 3;
 }

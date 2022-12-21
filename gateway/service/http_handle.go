@@ -51,4 +51,7 @@ func (s *Service) HTTPHandler(httpMux *http.ServeMux) {
 	httpMux.Handle("/cic/register", handler.Build(s.HTTPRegisterCICForUser))
 	httpMux.Handle("/face/register", handler.Build(s.HTTPRegisterNewUserFace))
 	httpMux.Handle("/face/authorize", handler.Build(s.HTTPAuthorizeNewUserFace))
+	httpMux.Handle("/timekeeping/create", handler.Build(s.HTTPCreateHistoryOfUser))
+	httpMux.Handle("/timekeeping/history", handler.Build(s.HTTPGetHistoryOfUser))
+	httpMux.Handle("/timekeeping/update", handler.Build(s.HTTPUpdateHistoryOfUser))
 }
