@@ -7,10 +7,23 @@ option go_package = "../api";
 import "library/envoyproxy/validate/validate.proto";
 
 message RegisterNewUserRequest {
-  string username = 1 [(validate.rules).string = {min_len:1, max_len:50}];
+  string employee_id = 1 [(validate.rules).string = {min_len:1, max_len:50}];
   string name = 2 [(validate.rules).string = {min_len:1, max_len:255}];
   string password = 3 [(validate.rules).string = {min_len:8, max_len:255}];
-  string email = 4 [(validate.rules).string = {min_len:1, max_len:255}];
+  string email = 4;
+  UserRole role = 5;
+  string position = 6;
+  string department = 7;
+  string gender = 8;
+  string address = 9;
+  string phone = 10;
+}
+
+enum UserRole {
+  OTHER = 0;
+  STAFF = 1;
+  MANAGER = 2;
+  HR = 3;
 }
 
 message UpdateCitizenIdentityCardRequest {
@@ -38,7 +51,9 @@ message RegisterNewUserResponse {
 
 message AuthorizeUserRequest {
   string email = 1;
-  string username = 2;
+  string employee_id = 2 [(validate.rules).string = {
+    min_len: 1, max_len: 10
+  }];
   string password = 3 [(validate.rules).string = {min_len:8, max_len:255}];
 }
 

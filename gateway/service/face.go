@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/cast"
 	"io"
 	"net/http"
-	"strings"
 )
 
 func (s *Service) HTTPRegisterNewUserFace(writer http.ResponseWriter, req *http.Request) error {
@@ -23,18 +22,13 @@ func (s *Service) HTTPRegisterNewUserFace(writer http.ResponseWriter, req *http.
 		logger.Error(err, "ParseMultipartForm")
 		return err
 	}
-	faceFile, header, err := req.FormFile("face")
+	faceFile, _, err := req.FormFile("face")
 	if err != nil {
 		logger.Error(err, "FormFile")
 		return err
 	}
 	defer faceFile.Close()
-	userId := strings.Split(header.Filename, ".")[0]
-	userIdInt := cast.ToInt64(userId)
-	if userIdInt != req.Context().Value(ContextUserId) {
-		err = errors.New("wrong user")
-		return err
-	}
+	userId := req.Context().Value(ContextUserId)
 	logger.WithValues("userId", userId)
 	dataBytes := bytes.NewBuffer(nil)
 	if _, err := io.Copy(dataBytes, faceFile); err != nil {
@@ -42,7 +36,7 @@ func (s *Service) HTTPRegisterNewUserFace(writer http.ResponseWriter, req *http.
 		return err
 	}
 	res, err := s.cvClient.RegisterUserFace(context.Background(), &cvApi.RegisterUserFaceRequest{
-		UserId: userIdInt,
+		UserId: cast.ToInt64(userId),
 		Image:  dataBytes.Bytes(),
 	})
 	if err != nil {
@@ -67,18 +61,13 @@ func (s *Service) HTTPAuthorizeNewUserFace(writer http.ResponseWriter, req *http
 		logger.Error(err, "ParseMultipartForm")
 		return err
 	}
-	faceFile, header, err := req.FormFile("face")
+	faceFile, _, err := req.FormFile("face")
 	if err != nil {
 		logger.Error(err, "FormFile")
 		return err
 	}
 	defer faceFile.Close()
-	userId := strings.Split(header.Filename, ".")[0]
-	userIdInt := cast.ToInt64(userId)
-	if userIdInt != req.Context().Value(ContextUserId) {
-		err = errors.New("wrong user")
-		return err
-	}
+	userId := req.Context().Value(ContextUserId)
 	logger.WithValues("userId", userId)
 	dataBytes := bytes.NewBuffer(nil)
 	if _, err := io.Copy(dataBytes, faceFile); err != nil {
@@ -86,7 +75,7 @@ func (s *Service) HTTPAuthorizeNewUserFace(writer http.ResponseWriter, req *http
 		return err
 	}
 	res, err := s.cvClient.AuthorizeUserFace(context.Background(), &cvApi.AuthorizeUserFaceRequest{
-		UserId: userIdInt,
+		UserId: cast.ToInt64(userId),
 		Image:  dataBytes.Bytes(),
 	})
 	if err != nil {

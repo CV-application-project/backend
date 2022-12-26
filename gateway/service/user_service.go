@@ -19,10 +19,16 @@ func (s *Service) RegisterNewUser(ctx context.Context, req *api.RegisterNewUserR
 	}
 
 	userReq := &userApi.RegisterUserRequest{
-		Username: req.Username,
-		Name:     req.Name,
-		Email:    req.Email,
-		Password: req.Password,
+		EmployeeId: req.EmployeeId,
+		Name:       req.Name,
+		Email:      req.Email,
+		Password:   req.Password,
+		Address:    req.Address,
+		Phone:      req.Phone,
+		Gender:     req.Gender,
+		Department: req.Department,
+		Position:   req.Position,
+		Role:       toUserRole(req.Role),
 	}
 
 	// Send request to User service
@@ -40,7 +46,7 @@ func (s *Service) RegisterNewUser(ctx context.Context, req *api.RegisterNewUserR
 	// Store token into db
 	if _, err = s.store.CreateUserInfo(ctx, store.CreateUserInfoParams{
 		UserID:    res.Data.UserId,
-		Username:  req.Username,
+		Username:  req.EmployeeId,
 		Email:     req.Email,
 		Token:     userToken.Token,
 		ExpiredAt: userToken.ExpiredAt,
@@ -60,7 +66,7 @@ func (s *Service) AuthorizeUser(ctx context.Context, req *api.AuthorizeUserReque
 	logger := s.log.WithName("AuthorizeUser")
 
 	user, err := s.store.GetUserInfoByUsernameOrEmail(ctx, store.GetUserInfoByUsernameOrEmailParams{
-		Username: req.Username,
+		Username: req.EmployeeId,
 		Email:    req.Email,
 	})
 	if err != nil {
@@ -69,9 +75,9 @@ func (s *Service) AuthorizeUser(ctx context.Context, req *api.AuthorizeUserReque
 	}
 
 	authorizeResp, err := s.userClient.AuthorizeUser(ctx, &userApi.AuthorizeUserRequest{
-		Username: user.Username,
-		Email:    user.Email,
-		Password: req.Password,
+		EmployeeId: user.Username,
+		Email:      user.Email,
+		Password:   req.Password,
 	})
 	if err != nil {
 		logger.Error(err, "userClient | AuthorizeUser")

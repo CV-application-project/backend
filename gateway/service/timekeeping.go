@@ -20,10 +20,6 @@ func (s *Service) HTTPCreateHistoryOfUser(w http.ResponseWriter, r *http.Request
 		logger.Error(err, "json | decode")
 		return err
 	}
-	if r.Context().Value(ContextUserId) != request.UserId {
-		err = errors.New("wrong user")
-		return err
-	}
 	resp, err := s.timekeepingClient.CreateHistoryOfUser(r.Context(), &request)
 	if err != nil {
 		logger.Error(err, "timekeepingClient | CreateHistoryOfUser")
@@ -50,10 +46,6 @@ func (s *Service) HTTPGetHistoryOfUser(w http.ResponseWriter, r *http.Request) e
 		logger.Error(err, "json | decode")
 		return err
 	}
-	if r.Context().Value(ContextUserId) != request.UserId {
-		err = errors.New("wrong user")
-		return err
-	}
 	resp, err := s.timekeepingClient.GetHistoryOfUser(r.Context(), &request)
 	if err != nil {
 		logger.Error(err, "timekeepingClient | GetHistoryOfUser")
@@ -77,10 +69,6 @@ func (s *Service) HTTPUpdateHistoryOfUser(w http.ResponseWriter, r *http.Request
 	var request timekeepingApi.UpdateHistoryOfUserRequest
 	if err = json.NewDecoder(r.Body).Decode(&request); err != nil {
 		logger.Error(err, "json | decode")
-		return err
-	}
-	if r.Context().Value(ContextUserId) != request.UserId {
-		err = errors.New("wrong user")
 		return err
 	}
 	resp, err := s.timekeepingClient.UpdateHistoryOfUser(r.Context(), &request)

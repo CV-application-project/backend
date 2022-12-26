@@ -10,14 +10,20 @@ import (
 )
 
 type User struct {
-	ID        int64          `json:"id"`
-	Name      string         `json:"name"`
-	Username  string         `json:"username"`
-	Password  string         `json:"password"`
-	Data      sql.NullString `json:"data"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	Email     string         `json:"email"`
+	ID         int64          `json:"id"`
+	Name       string         `json:"name"`
+	Username   string         `json:"username"`
+	Password   string         `json:"password"`
+	Phone      sql.NullString `json:"phone"`
+	Address    sql.NullString `json:"address"`
+	Gender     sql.NullString `json:"gender"`
+	Department sql.NullString `json:"department"`
+	Position   sql.NullString `json:"position"`
+	Role       sql.NullString `json:"role"`
+	Data       sql.NullString `json:"data"`
+	CreatedAt  time.Time      `json:"created_at"`
+	UpdatedAt  time.Time      `json:"updated_at"`
+	Email      string         `json:"email"`
 }
 
 type UserToken struct {

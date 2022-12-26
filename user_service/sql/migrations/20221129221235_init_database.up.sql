@@ -4,6 +4,12 @@ create table if not exists user
     `name`       nvarchar(255) not null,
     `username`   nvarchar(255) not null,
     `password`   text          not null COLLATE utf8mb4_general_ci,
+    `phone`      nvarchar(10),
+    `address`    nvarchar(255),
+    `gender`     nvarchar(10),
+    `department` nvarchar(255),
+    `position`   nvarchar(255),
+    `role`       nvarchar(20),
     `data`       text COLLATE utf8mb4_general_ci,
     `created_at` timestamp     not null default now(),
     `updated_at` timestamp     not null default now() on update now()

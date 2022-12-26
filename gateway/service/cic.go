@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/cast"
 	"io"
 	"net/http"
-	"strings"
 )
 
 func (s *Service) RegisterCICForUser(ctx context.Context, req *api.RegisterCICForUserRequest) (*api.RegisterCICForUserResponse, error) {
@@ -48,18 +47,13 @@ func (s *Service) HTTPRegisterCICForUser(res http.ResponseWriter, req *http.Requ
 		logger.Error(err, "ParseMultipartForm")
 		return err
 	}
-	frontImageFile, header, err := req.FormFile("front")
+	frontImageFile, _, err := req.FormFile("front")
 	if err != nil {
 		logger.Error(err, "FormFile")
 		return err
 	}
 	defer frontImageFile.Close()
-	userId := strings.Split(header.Filename, "_")[0]
-	userIdInt := cast.ToInt64(userId)
-	if userIdInt != req.Context().Value(ContextUserId) {
-		err = errors.New("wrong user")
-		return err
-	}
+	userId := req.Context().Value(ContextUserId)
 	logger.WithValues("user_id", userId)
 	frontData := bytes.NewBuffer(nil)
 	if _, err = io.Copy(frontData, frontImageFile); err != nil {
@@ -78,7 +72,7 @@ func (s *Service) HTTPRegisterCICForUser(res http.ResponseWriter, req *http.Requ
 		return err
 	}
 	resp, err := s.RegisterCICForUser(context.Background(), &api.RegisterCICForUserRequest{
-		UserId: userIdInt,
+		UserId: cast.ToInt64(userId),
 		Front:  frontData.Bytes(),
 		Back:   backData.Bytes(),
 	})

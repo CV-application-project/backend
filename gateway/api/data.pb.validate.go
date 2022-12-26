@@ -41,9 +41,9 @@ func (m *RegisterNewUserRequest) Validate() error {
 		return nil
 	}
 
-	if l := utf8.RuneCountInString(m.GetUsername()); l < 1 || l > 50 {
+	if l := utf8.RuneCountInString(m.GetEmployeeId()); l < 1 || l > 50 {
 		return RegisterNewUserRequestValidationError{
-			field:  "Username",
+			field:  "EmployeeId",
 			reason: "value length must be between 1 and 50 runes, inclusive",
 		}
 	}
@@ -62,12 +62,19 @@ func (m *RegisterNewUserRequest) Validate() error {
 		}
 	}
 
-	if l := utf8.RuneCountInString(m.GetEmail()); l < 1 || l > 255 {
-		return RegisterNewUserRequestValidationError{
-			field:  "Email",
-			reason: "value length must be between 1 and 255 runes, inclusive",
-		}
-	}
+	// no validation rules for Email
+
+	// no validation rules for Role
+
+	// no validation rules for Position
+
+	// no validation rules for Department
+
+	// no validation rules for Gender
+
+	// no validation rules for Address
+
+	// no validation rules for Phone
 
 	return nil
 }
@@ -453,7 +460,12 @@ func (m *AuthorizeUserRequest) Validate() error {
 
 	// no validation rules for Email
 
-	// no validation rules for Username
+	if l := utf8.RuneCountInString(m.GetEmployeeId()); l < 1 || l > 10 {
+		return AuthorizeUserRequestValidationError{
+			field:  "EmployeeId",
+			reason: "value length must be between 1 and 10 runes, inclusive",
+		}
+	}
 
 	if l := utf8.RuneCountInString(m.GetPassword()); l < 8 || l > 255 {
 		return AuthorizeUserRequestValidationError{

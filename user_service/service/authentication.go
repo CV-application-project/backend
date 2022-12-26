@@ -13,19 +13,15 @@ import (
 )
 
 func (s *Service) RegisterUser(ctx context.Context, req *api.RegisterUserRequest) (*api.RegisterUserResponse, error) {
-	logger := s.log.WithName("RegisterUser").WithValues("traceId", req.Username)
-	if err := req.Validate(); err != nil {
-		logger.Error(err, "Validate request failed")
-		return nil, err
-	}
+	logger := s.log.WithName("RegisterUser").WithValues("traceId", req.EmployeeId)
 	// Check whether user with this username exists?
 	_, err := s.store.GetUserByUsernameOrEmail(ctx, store.GetUserByUsernameOrEmailParams{
-		Username: req.Username,
+		Username: req.EmployeeId,
 		Email:    req.Email,
 	})
 	if err != nil {
 		if err != sql.ErrNoRows {
-			logger.Error(err, "GetUserByUsernameOrEmail | Can not get user record", "username", req.Username, "email", req.Email)
+			logger.Error(err, "GetUserByUsernameOrEmail | Can not get user record", "username", req.EmployeeId, "email", req.Email)
 			return nil, err
 		}
 		logger.Info("There is no user with this username and email")
@@ -38,14 +34,20 @@ func (s *Service) RegisterUser(ctx context.Context, req *api.RegisterUserRequest
 		}
 
 		insertResult, err := s.store.CreateNewUserInfo(ctx, store.CreateNewUserInfoParams{
-			Name:     req.Name,
-			Username: req.Username,
-			Password: string(hashPassword),
-			Email:    req.Email,
-			Data:     sql.NullString{Valid: false, String: ""},
+			Name:       req.Name,
+			Username:   req.EmployeeId,
+			Password:   string(hashPassword),
+			Email:      req.Email,
+			Role:       sql.NullString{Valid: true, String: req.Role.String()},
+			Position:   sql.NullString{Valid: true, String: req.Position},
+			Department: sql.NullString{Valid: true, String: req.Department},
+			Phone:      sql.NullString{Valid: true, String: req.Phone},
+			Address:    sql.NullString{Valid: true, String: req.Address},
+			Gender:     sql.NullString{Valid: true, String: req.Gender},
+			Data:       sql.NullString{Valid: false, String: ""},
 		})
 		if err != nil {
-			logger.Error(err, "CreateNewUserInfo | Can not create new user", "username", req.Username)
+			logger.Error(err, "CreateNewUserInfo | Can not create new user", "username", req.EmployeeId)
 			return nil, err
 		}
 		userId, err := insertResult.LastInsertId()
@@ -85,15 +87,15 @@ func (s *Service) RegisterUser(ctx context.Context, req *api.RegisterUserRequest
 
 func (s *Service) AuthorizeUser(ctx context.Context, req *api.AuthorizeUserRequest) (*api.AuthorizeUserResponse, error) {
 	traceId := ""
-	if req.Username != "" {
-		traceId = req.Username
+	if req.EmployeeId != "" {
+		traceId = req.EmployeeId
 	} else if req.Email != "" {
 		traceId = req.Email
 	}
 	logger := s.log.WithName("AuthorizeUser").WithValues("userId", traceId)
 
 	user, err := s.store.GetUserByUsernameOrEmail(ctx, store.GetUserByUsernameOrEmailParams{
-		Username: req.Username,
+		Username: req.EmployeeId,
 		Email:    req.Email,
 	})
 	if err != nil {

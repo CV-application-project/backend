@@ -11,15 +11,21 @@ import (
 )
 
 const createNewUserInfo = `-- name: CreateNewUserInfo :execresult
-insert into user (name, username, password, data, email) values (?, ?, ?, ?, ?)
+insert into user (name, username, password, phone, address, gender, department, position, role, data, email) value (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type CreateNewUserInfoParams struct {
-	Name     string         `json:"name"`
-	Username string         `json:"username"`
-	Password string         `json:"password"`
-	Data     sql.NullString `json:"data"`
-	Email    string         `json:"email"`
+	Name       string         `json:"name"`
+	Username   string         `json:"username"`
+	Password   string         `json:"password"`
+	Phone      sql.NullString `json:"phone"`
+	Address    sql.NullString `json:"address"`
+	Gender     sql.NullString `json:"gender"`
+	Department sql.NullString `json:"department"`
+	Position   sql.NullString `json:"position"`
+	Role       sql.NullString `json:"role"`
+	Data       sql.NullString `json:"data"`
+	Email      string         `json:"email"`
 }
 
 func (q *Queries) CreateNewUserInfo(ctx context.Context, arg CreateNewUserInfoParams) (sql.Result, error) {
@@ -27,13 +33,19 @@ func (q *Queries) CreateNewUserInfo(ctx context.Context, arg CreateNewUserInfoPa
 		arg.Name,
 		arg.Username,
 		arg.Password,
+		arg.Phone,
+		arg.Address,
+		arg.Gender,
+		arg.Department,
+		arg.Position,
+		arg.Role,
 		arg.Data,
 		arg.Email,
 	)
 }
 
 const getUserByUsernameOrEmail = `-- name: GetUserByUsernameOrEmail :one
-select id, name, username, password, data, created_at, updated_at, email from user where username = ? or email = ? limit 1
+select id, name, username, password, phone, address, gender, department, position, role, data, created_at, updated_at, email from user where username = ? or email = ? limit 1
 `
 
 type GetUserByUsernameOrEmailParams struct {
@@ -49,6 +61,12 @@ func (q *Queries) GetUserByUsernameOrEmail(ctx context.Context, arg GetUserByUse
 		&i.Name,
 		&i.Username,
 		&i.Password,
+		&i.Phone,
+		&i.Address,
+		&i.Gender,
+		&i.Department,
+		&i.Position,
+		&i.Role,
 		&i.Data,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -58,7 +76,7 @@ func (q *Queries) GetUserByUsernameOrEmail(ctx context.Context, arg GetUserByUse
 }
 
 const getUserInfoById = `-- name: GetUserInfoById :one
-select id, name, username, password, data, created_at, updated_at, email from user where id = ? limit 1
+select id, name, username, password, phone, address, gender, department, position, role, data, created_at, updated_at, email from user where id = ? limit 1
 `
 
 func (q *Queries) GetUserInfoById(ctx context.Context, id int64) (User, error) {
@@ -69,6 +87,12 @@ func (q *Queries) GetUserInfoById(ctx context.Context, id int64) (User, error) {
 		&i.Name,
 		&i.Username,
 		&i.Password,
+		&i.Phone,
+		&i.Address,
+		&i.Gender,
+		&i.Department,
+		&i.Position,
+		&i.Role,
 		&i.Data,
 		&i.CreatedAt,
 		&i.UpdatedAt,

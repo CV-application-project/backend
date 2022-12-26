@@ -2,7 +2,7 @@
 select * from user where id = ? limit 1;
 
 /* name: CreateNewUserInfo :execresult */
-insert into user (name, username, password, data, email) values (?, ?, ?, ?, ?);
+insert into user (name, username, password, phone, address, gender, department, position, role, data, email) value (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 /* name: UpdateUserInfoById :execresult */
 update user set data = ? where id = ?;
