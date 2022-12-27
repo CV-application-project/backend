@@ -88,7 +88,7 @@ func (s *Service) AuthorizeUser(ctx context.Context, req *api.AuthorizeUserReque
 		return &api.AuthorizeUserResponse{
 			Code:    http.StatusOK,
 			Message: "success",
-			Token:   user.Token,
+			Token:   "Bearer " + user.Token,
 		}, nil
 	}
 
