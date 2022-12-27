@@ -24,6 +24,19 @@ func (s *Service) RegisterCICForUser(ctx context.Context, req *api.RegisterCICFo
 	}
 	logger := s.log.WithName("RegisterCICForUser").WithValues("user_id", req.UserId)
 
+	info, err := s.store.GetCICByUserId(ctx, req.UserId)
+	switch err {
+	case nil:
+		return &api.RegisterCICForUserResponse{
+			Code:    http.StatusOK,
+			Message: "User has already registered Card",
+			Data:    convertToCIC(info.Data.String),
+		}, nil
+	case sql.ErrNoRows:
+		logger.Info("User hasn't registered card yet")
+	default:
+		return nil, err
+	}
 	if err := s.cicPreProcessing(req.UserId, req.Front, req.Back); err != nil {
 		logger.Error(err, "cicPreProcessing")
 		return nil, err
@@ -53,7 +66,16 @@ func (s *Service) RegisterCICForUser(ctx context.Context, req *api.RegisterCICFo
 	return &api.RegisterCICForUserResponse{
 		Code:    http.StatusOK,
 		Message: "success",
+		Data:    card,
 	}, nil
+}
+
+func convertToCIC(s string) *api.CitizenIdentityCard {
+	var data api.CitizenIdentityCard
+	if err := json.Unmarshal([]byte(s), &data); err != nil {
+		return nil
+	}
+	return &data
 }
 
 func (s *Service) cicPreProcessing(userId int64, front []byte, back []byte) error {

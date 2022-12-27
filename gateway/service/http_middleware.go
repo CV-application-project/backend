@@ -1,6 +1,7 @@
 package service
 
 import (
+	"Backend-Server/common_error"
 	"context"
 	"errors"
 	"net/http"
@@ -22,7 +23,7 @@ func (s *Service) authenticationMiddleware(next AppHandleFunc) AppHandleFunc {
 		tokenKey = strings.Split(tokenKey, " ")[1]
 		info, err := s.store.GetUserInfoByToken(ctx, tokenKey)
 		if err != nil {
-			return err
+			return common_error.ErrUserNotFound
 		}
 		ctx = context.WithValue(ctx, ContextUserId, info.UserID)
 		r = r.WithContext(ctx)
