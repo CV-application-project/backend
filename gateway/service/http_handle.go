@@ -48,10 +48,13 @@ func (h *AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) HTTPHandler(httpMux *http.ServeMux) {
 	handler := New(s.authenticationMiddleware, s.corsMiddleware)
-	httpMux.Handle("/cic/register", handler.Build(s.HTTPRegisterCICForUser))
+	httpMux.Handle("/cic/upsert", handler.Build(s.HTTPUpsertCICForUser))
 	httpMux.Handle("/face/register", handler.Build(s.HTTPRegisterNewUserFace))
 	httpMux.Handle("/face/authorize", handler.Build(s.HTTPAuthorizeNewUserFace))
 	httpMux.Handle("/timekeeping/create", handler.Build(s.HTTPCreateHistoryOfUser))
 	httpMux.Handle("/timekeeping/history", handler.Build(s.HTTPGetHistoryOfUser))
 	httpMux.Handle("/timekeeping/update", handler.Build(s.HTTPUpdateHistoryOfUser))
+	httpMux.Handle("/timekeeping/upsert", handler.Build(s.HTTPUpsertHistoryOfUser))
+	httpMux.Handle("/user/update", handler.Build(s.HTTPUpdateUser))
+	httpMux.Handle("/user/export", handler.Build(s.HTTPExportUsersByDepartment))
 }

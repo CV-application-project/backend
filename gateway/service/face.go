@@ -1,6 +1,7 @@
 package service
 
 import (
+	"Backend-Server/common/ctx_key"
 	cvApi "Backend-Server/cv_service/api"
 	"bytes"
 	"context"
@@ -28,7 +29,7 @@ func (s *Service) HTTPRegisterNewUserFace(writer http.ResponseWriter, req *http.
 		return err
 	}
 	defer faceFile.Close()
-	userId := req.Context().Value(ContextUserId)
+	userId := req.Context().Value(ctx_key.ContextUserId)
 	logger.WithValues("userId", userId)
 	dataBytes := bytes.NewBuffer(nil)
 	if _, err := io.Copy(dataBytes, faceFile); err != nil {
@@ -67,7 +68,7 @@ func (s *Service) HTTPAuthorizeNewUserFace(writer http.ResponseWriter, req *http
 		return err
 	}
 	defer faceFile.Close()
-	userId := req.Context().Value(ContextUserId)
+	userId := req.Context().Value(ctx_key.ContextUserId)
 	logger.WithValues("userId", userId)
 	dataBytes := bytes.NewBuffer(nil)
 	if _, err := io.Copy(dataBytes, faceFile); err != nil {

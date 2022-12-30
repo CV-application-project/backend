@@ -12,30 +12,34 @@ import (
 )
 
 const createUserInfo = `-- name: CreateUserInfo :execresult
-insert into user_info (user_id, username, email, token, expired_at)
-VALUES (?, ?, ?, ?, ?)
+insert into user_info (user_id, employee_id, role, email, token, expired_at, department)
+VALUES (?, ?, ?, ?, ?, ?, ?)
 `
 
 type CreateUserInfoParams struct {
-	UserID    int64     `json:"user_id"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	Token     string    `json:"token"`
-	ExpiredAt time.Time `json:"expired_at"`
+	UserID     int64          `json:"user_id"`
+	EmployeeID string         `json:"employee_id"`
+	Role       sql.NullString `json:"role"`
+	Email      string         `json:"email"`
+	Token      string         `json:"token"`
+	ExpiredAt  time.Time      `json:"expired_at"`
+	Department sql.NullString `json:"department"`
 }
 
 func (q *Queries) CreateUserInfo(ctx context.Context, arg CreateUserInfoParams) (sql.Result, error) {
 	return q.exec(ctx, q.createUserInfoStmt, createUserInfo,
 		arg.UserID,
-		arg.Username,
+		arg.EmployeeID,
+		arg.Role,
 		arg.Email,
 		arg.Token,
 		arg.ExpiredAt,
+		arg.Department,
 	)
 }
 
 const getUserInfoByToken = `-- name: GetUserInfoByToken :one
-select id, user_id, username, email, token, created_at, updated_at, expired_at
+select id, user_id, employee_id, role, email, token, created_at, updated_at, expired_at, department, front_card, back_card
 from user_info
 where token = ?
   and expired_at > now()
@@ -47,43 +51,68 @@ func (q *Queries) GetUserInfoByToken(ctx context.Context, token string) (UserInf
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
-		&i.Username,
+		&i.EmployeeID,
+		&i.Role,
 		&i.Email,
 		&i.Token,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.ExpiredAt,
+		&i.Department,
+		&i.FrontCard,
+		&i.BackCard,
 	)
 	return i, err
 }
 
 const getUserInfoByUsernameOrEmail = `-- name: GetUserInfoByUsernameOrEmail :one
-select id, user_id, username, email, token, created_at, updated_at, expired_at
+select id, user_id, employee_id, role, email, token, created_at, updated_at, expired_at, department, front_card, back_card
 from user_info
-where username = ?
+where employee_id = ?
    or email = ?
 limit 1
 `
 
 type GetUserInfoByUsernameOrEmailParams struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	EmployeeID string `json:"employee_id"`
+	Email      string `json:"email"`
 }
 
 func (q *Queries) GetUserInfoByUsernameOrEmail(ctx context.Context, arg GetUserInfoByUsernameOrEmailParams) (UserInfo, error) {
-	row := q.queryRow(ctx, q.getUserInfoByUsernameOrEmailStmt, getUserInfoByUsernameOrEmail, arg.Username, arg.Email)
+	row := q.queryRow(ctx, q.getUserInfoByUsernameOrEmailStmt, getUserInfoByUsernameOrEmail, arg.EmployeeID, arg.Email)
 	var i UserInfo
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
-		&i.Username,
+		&i.EmployeeID,
+		&i.Role,
 		&i.Email,
 		&i.Token,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.ExpiredAt,
+		&i.Department,
+		&i.FrontCard,
+		&i.BackCard,
 	)
 	return i, err
+}
+
+const updateUserCard = `-- name: UpdateUserCard :execresult
+update user_info
+set front_card = ?,
+    back_card  = ?
+where user_id = ?
+`
+
+type UpdateUserCardParams struct {
+	FrontCard sql.NullString `json:"front_card"`
+	BackCard  sql.NullString `json:"back_card"`
+	UserID    int64          `json:"user_id"`
+}
+
+func (q *Queries) UpdateUserCard(ctx context.Context, arg UpdateUserCardParams) (sql.Result, error) {
+	return q.exec(ctx, q.updateUserCardStmt, updateUserCard, arg.FrontCard, arg.BackCard, arg.UserID)
 }
 
 const updateUserInfoTokenByUserId = `-- name: UpdateUserInfoTokenByUserId :execresult

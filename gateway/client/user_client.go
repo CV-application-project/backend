@@ -11,6 +11,8 @@ import (
 type UserClient interface {
 	RegisterUser(ctx context.Context, req *api.RegisterUserRequest) (*api.RegisterUserResponse, error)
 	AuthorizeUser(ctx context.Context, req *api.AuthorizeUserRequest) (*api.AuthorizeUserResponse, error)
+	UpdateUserInfo(ctx context.Context, req *api.UpdateUserInfoRequest) (*api.UpdateUserInfoResponse, error)
+	ExportUsersByDepartment(ctx context.Context, req *api.ExportUsersByDepartmentRequest) (*api.ExportUsersByDepartmentResponse, error)
 }
 
 type userClient struct {
@@ -35,4 +37,12 @@ func (c *userClient) RegisterUser(ctx context.Context, req *api.RegisterUserRequ
 
 func (c *userClient) AuthorizeUser(ctx context.Context, req *api.AuthorizeUserRequest) (*api.AuthorizeUserResponse, error) {
 	return c.client.AuthorizeUser(ctx, req)
+}
+
+func (c *userClient) UpdateUserInfo(ctx context.Context, req *api.UpdateUserInfoRequest) (*api.UpdateUserInfoResponse, error) {
+	return c.client.UpdateUserInfo(ctx, req)
+}
+
+func (c *userClient) ExportUsersByDepartment(ctx context.Context, req *api.ExportUsersByDepartmentRequest) (*api.ExportUsersByDepartmentResponse, error) {
+	return c.client.ExportUsersByDepartment(ctx, req)
 }

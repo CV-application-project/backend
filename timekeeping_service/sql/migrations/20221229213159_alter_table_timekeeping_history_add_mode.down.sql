@@ -1,0 +1,1 @@
+alter table timekeeping_history drop mode;

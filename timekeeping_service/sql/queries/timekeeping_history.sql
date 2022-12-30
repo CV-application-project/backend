@@ -32,8 +32,16 @@ where `user_id` = ?
   and `day` = ?
   and `month` = ?
   and `year` = ?
-  and is_active = true;
+  and is_active = true
+  and mode = abs(mode - 1);
 
 /* name: GetTimekeepingHistoryByDuration :many */
-select * from timekeeping_history
-where `user_id` = ? and `created_at` between ? and ?
+select *
+from timekeeping_history
+where `user_id` = ?
+  and `created_at` between ? and ?;
+
+/* name: GetHistoryByList :many */
+select *
+from timekeeping_history
+where user_id in (?);

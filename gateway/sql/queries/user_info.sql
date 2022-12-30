@@ -1,7 +1,7 @@
 /* name: GetUserInfoByUsernameOrEmail :one */
 select *
 from user_info
-where username = ?
+where employee_id = ?
    or email = ?
 limit 1;
 
@@ -18,5 +18,11 @@ set token      = ?,
 where user_id = ?;
 
 /* name: CreateUserInfo :execresult */
-insert into user_info (user_id, username, email, token, expired_at)
-VALUES (?, ?, ?, ?, ?);
+insert into user_info (user_id, employee_id, role, email, token, expired_at, department)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+/* name: UpdateUserCard :execresult */
+update user_info
+set front_card = ?,
+    back_card  = ?
+where user_id = ?;

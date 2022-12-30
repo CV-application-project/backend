@@ -762,6 +762,16 @@ func (m *RegisterCICForUserResponse) Validate() error {
 
 	// no validation rules for Message
 
+	if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RegisterCICForUserResponseValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

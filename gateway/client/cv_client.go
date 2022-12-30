@@ -9,7 +9,7 @@ import (
 )
 
 type CVClient interface {
-	RegisterCICForUser(ctx context.Context, req *cvApi.RegisterCICForUserRequest) (*cvApi.RegisterCICForUserResponse, error)
+	UpsertCICForUser(ctx context.Context, req *cvApi.UpsertCICForUserRequest) (*cvApi.UpsertCICForUserResponse, error)
 	RegisterUserFace(ctx context.Context, req *cvApi.RegisterUserFaceRequest) (*cvApi.RegisterUserFaceResponse, error)
 	AuthorizeUserFace(ctx context.Context, req *cvApi.AuthorizeUserFaceRequest) (*cvApi.AuthorizeUserFaceResponse, error)
 }
@@ -30,8 +30,8 @@ func NewCVClient(logger logr.Logger, addr string) (CVClient, error) {
 	}, nil
 }
 
-func (c *cvClient) RegisterCICForUser(ctx context.Context, req *cvApi.RegisterCICForUserRequest) (*cvApi.RegisterCICForUserResponse, error) {
-	return c.client.RegisterCICForUser(ctx, req)
+func (c *cvClient) UpsertCICForUser(ctx context.Context, req *cvApi.UpsertCICForUserRequest) (*cvApi.UpsertCICForUserResponse, error) {
+	return c.client.UpsertCICForUser(ctx, req)
 }
 
 func (c *cvClient) RegisterUserFace(ctx context.Context, req *cvApi.RegisterUserFaceRequest) (*cvApi.RegisterUserFaceResponse, error) {

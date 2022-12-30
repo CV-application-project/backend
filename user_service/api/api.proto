@@ -20,4 +20,16 @@ service UserService {
       body: "*"
     };
   }
+  rpc UpdateUserInfo(UpdateUserInfoRequest) returns (UpdateUserInfoResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/update",
+      body: "*"
+    };
+  }
+  rpc ExportUsersByDepartment(ExportUsersByDepartmentRequest) returns (ExportUsersByDepartmentResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/export",
+      body: "*"
+    };
+  }
 }

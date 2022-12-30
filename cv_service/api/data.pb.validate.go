@@ -33,165 +33,6 @@ var (
 	_ = anypb.Any{}
 )
 
-// Validate checks the field values on RegisterCICForUserRequest with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *RegisterCICForUserRequest) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	if m.GetUserId() <= 0 {
-		return RegisterCICForUserRequestValidationError{
-			field:  "UserId",
-			reason: "value must be greater than 0",
-		}
-	}
-
-	// no validation rules for Front
-
-	// no validation rules for Back
-
-	return nil
-}
-
-// RegisterCICForUserRequestValidationError is the validation error returned by
-// RegisterCICForUserRequest.Validate if the designated constraints aren't met.
-type RegisterCICForUserRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e RegisterCICForUserRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e RegisterCICForUserRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e RegisterCICForUserRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e RegisterCICForUserRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e RegisterCICForUserRequestValidationError) ErrorName() string {
-	return "RegisterCICForUserRequestValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e RegisterCICForUserRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRegisterCICForUserRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = RegisterCICForUserRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = RegisterCICForUserRequestValidationError{}
-
-// Validate checks the field values on RegisterCICForUserResponse with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *RegisterCICForUserResponse) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for Code
-
-	// no validation rules for Message
-
-	if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RegisterCICForUserResponseValidationError{
-				field:  "Data",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	return nil
-}
-
-// RegisterCICForUserResponseValidationError is the validation error returned
-// by RegisterCICForUserResponse.Validate if the designated constraints aren't met.
-type RegisterCICForUserResponseValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e RegisterCICForUserResponseValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e RegisterCICForUserResponseValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e RegisterCICForUserResponseValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e RegisterCICForUserResponseValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e RegisterCICForUserResponseValidationError) ErrorName() string {
-	return "RegisterCICForUserResponseValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e RegisterCICForUserResponseValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sRegisterCICForUserResponse.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = RegisterCICForUserResponseValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = RegisterCICForUserResponseValidationError{}
-
 // Validate checks the field values on GetCICByUserIdRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -762,3 +603,162 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AuthorizeUserFaceResponseValidationError{}
+
+// Validate checks the field values on UpsertCICForUserRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpsertCICForUserRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetUserId() <= 0 {
+		return UpsertCICForUserRequestValidationError{
+			field:  "UserId",
+			reason: "value must be greater than 0",
+		}
+	}
+
+	// no validation rules for Front
+
+	// no validation rules for Back
+
+	return nil
+}
+
+// UpsertCICForUserRequestValidationError is the validation error returned by
+// UpsertCICForUserRequest.Validate if the designated constraints aren't met.
+type UpsertCICForUserRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpsertCICForUserRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpsertCICForUserRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpsertCICForUserRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpsertCICForUserRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpsertCICForUserRequestValidationError) ErrorName() string {
+	return "UpsertCICForUserRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpsertCICForUserRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpsertCICForUserRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpsertCICForUserRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpsertCICForUserRequestValidationError{}
+
+// Validate checks the field values on UpsertCICForUserResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpsertCICForUserResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpsertCICForUserResponseValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// UpsertCICForUserResponseValidationError is the validation error returned by
+// UpsertCICForUserResponse.Validate if the designated constraints aren't met.
+type UpsertCICForUserResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpsertCICForUserResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpsertCICForUserResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpsertCICForUserResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpsertCICForUserResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpsertCICForUserResponseValidationError) ErrorName() string {
+	return "UpsertCICForUserResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpsertCICForUserResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpsertCICForUserResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpsertCICForUserResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpsertCICForUserResponseValidationError{}

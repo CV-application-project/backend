@@ -7,6 +7,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"github.com/spf13/cast"
+	"math"
 	"net/http"
 	"time"
 )
@@ -59,10 +61,10 @@ func (s *Service) CreateHistoryOfUser(ctx context.Context, req *api.CreateHistor
 			return nil, err
 		}
 	}
-	data := &api.Data{
+	data := &api.HistoryDetail{
 		TotalTime: 0,
 		StartTime: req.StartTime,
-		Details: []*api.Data_Line{
+		Details: []*api.HistoryDetail_Line{
 			{
 				StartTime: req.StartTime,
 			},
@@ -94,7 +96,7 @@ func (s *Service) UpdateHistoryOfUser(ctx context.Context, req *api.UpdateHistor
 		logger.Error(err, "getOption")
 		return nil, err
 	}
-	now := time.Now()
+	now := time.Unix(cast.ToInt64(math.Abs(cast.ToFloat64(req.StartTime-req.EndTime))), 0)
 	history, err := s.store.GetTimekeepingHistoryInDayByUserId(ctx, store.GetTimekeepingHistoryInDayByUserIdParams{
 		UserID: req.UserId,
 		Day:    int32(now.Day()),
@@ -117,7 +119,7 @@ func (s *Service) UpdateHistoryOfUser(ctx context.Context, req *api.UpdateHistor
 		historyData.TotalTime += uint64(req.EndTime - nearestStartTime)
 		historyData.EndTime = req.EndTime
 	case TypeUpdateStartTime:
-		historyData.Details = append(historyData.Details, &api.Data_Line{
+		historyData.Details = append(historyData.Details, &api.HistoryDetail_Line{
 			StartTime: req.StartTime,
 			EndTime:   0,
 		})
@@ -145,4 +147,59 @@ func (s *Service) UpdateHistoryOfUser(ctx context.Context, req *api.UpdateHistor
 		Message:   "success",
 		TotalTime: int64(historyData.TotalTime),
 	}, nil
+}
+
+func (s *Service) UpsertHistoryOfUser(ctx context.Context, req *api.UpsertHistoryOfUserRequest) (*api.UpsertHistoryOfUserResponse, error) {
+	lockTime := time.Unix(req.LockTime, 0)
+	history, err := s.store.GetTimekeepingHistoryInDayByUserId(ctx, store.GetTimekeepingHistoryInDayByUserIdParams{
+		UserID: req.UserId,
+		Day:    int32(lockTime.Day()),
+		Month:  int32(lockTime.Month()),
+		Year:   int32(lockTime.Year()),
+	})
+	switch err {
+	case nil:
+		// Update
+		if !history.Mode.Bool {
+			result, err := s.UpdateHistoryOfUser(ctx, &api.UpdateHistoryOfUserRequest{
+				UserId:  req.UserId,
+				EndTime: req.LockTime,
+			})
+			if err != nil {
+				return nil, err
+			}
+			return &api.UpsertHistoryOfUserResponse{
+				Code:      http.StatusOK,
+				Message:   "success",
+				TotalTime: result.TotalTime,
+			}, nil
+		}
+		result, err := s.UpdateHistoryOfUser(ctx, &api.UpdateHistoryOfUserRequest{
+			UserId:    req.UserId,
+			StartTime: req.LockTime,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return &api.UpsertHistoryOfUserResponse{
+			Code:      http.StatusOK,
+			Message:   "success",
+			TotalTime: result.TotalTime,
+		}, nil
+	case sql.ErrNoRows:
+		_, err := s.CreateHistoryOfUser(ctx, &api.CreateHistoryOfUserRequest{
+			UserId:    req.UserId,
+			StartTime: req.LockTime,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return &api.UpsertHistoryOfUserResponse{
+			Code:      http.StatusOK,
+			Message:   "success",
+			TotalTime: 0,
+		}, nil
+	default:
+		return nil, err
+	}
 }

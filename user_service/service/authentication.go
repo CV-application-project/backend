@@ -1,6 +1,8 @@
 package service
 
 import (
+	"Backend-Server/common/errorz"
+	"Backend-Server/common/helper"
 	"Backend-Server/user_service/api"
 	"Backend-Server/user_service/constant"
 	"Backend-Server/user_service/store"
@@ -15,9 +17,9 @@ import (
 func (s *Service) RegisterUser(ctx context.Context, req *api.RegisterUserRequest) (*api.RegisterUserResponse, error) {
 	logger := s.log.WithName("RegisterUser").WithValues("traceId", req.EmployeeId)
 	// Check whether user with this username exists?
-	_, err := s.store.GetUserByUsernameOrEmail(ctx, store.GetUserByUsernameOrEmailParams{
-		Username: req.EmployeeId,
-		Email:    req.Email,
+	user, err := s.store.GetUserByUsernameOrEmail(ctx, store.GetUserByUsernameOrEmailParams{
+		EmployeeID: req.EmployeeId,
+		Email:      req.Email,
 	})
 	if err != nil {
 		if err != sql.ErrNoRows {
@@ -35,7 +37,7 @@ func (s *Service) RegisterUser(ctx context.Context, req *api.RegisterUserRequest
 
 		insertResult, err := s.store.CreateNewUserInfo(ctx, store.CreateNewUserInfoParams{
 			Name:       req.Name,
-			Username:   req.EmployeeId,
+			EmployeeID: req.EmployeeId,
 			Password:   string(hashPassword),
 			Email:      req.Email,
 			Role:       sql.NullString{Valid: true, String: req.Role.String()},
@@ -45,6 +47,8 @@ func (s *Service) RegisterUser(ctx context.Context, req *api.RegisterUserRequest
 			Address:    sql.NullString{Valid: true, String: req.Address},
 			Gender:     sql.NullString{Valid: true, String: req.Gender},
 			Data:       sql.NullString{Valid: false, String: ""},
+			FrontCard:  sql.NullString{Valid: true},
+			BackCard:   sql.NullString{Valid: true},
 		})
 		if err != nil {
 			logger.Error(err, "CreateNewUserInfo | Can not create new user", "username", req.EmployeeId)
@@ -78,10 +82,18 @@ func (s *Service) RegisterUser(ctx context.Context, req *api.RegisterUserRequest
 		}, nil
 	}
 	// case user already exists
+	info, err := s.store.GetUserTokenByUserId(ctx, user.ID)
+	if err != nil {
+		return nil, err
+	}
 	return &api.RegisterUserResponse{
 		Code:    http.StatusOK,
 		Message: "User already exists",
-		Data:    nil,
+		Data: &api.UserToken{
+			UserId:    info.UserID,
+			Token:     info.Token,
+			ExpiredAt: info.ExpiredAt.Unix(),
+		},
 	}, nil
 }
 
@@ -95,8 +107,8 @@ func (s *Service) AuthorizeUser(ctx context.Context, req *api.AuthorizeUserReque
 	logger := s.log.WithName("AuthorizeUser").WithValues("userId", traceId)
 
 	user, err := s.store.GetUserByUsernameOrEmail(ctx, store.GetUserByUsernameOrEmailParams{
-		Username: req.EmployeeId,
-		Email:    req.Email,
+		EmployeeID: req.EmployeeId,
+		Email:      req.Email,
 	})
 	if err != nil {
 		logger.Error(err, "Store | GetUserByUsernameOrEmail")
@@ -122,5 +134,61 @@ func (s *Service) AuthorizeUser(ctx context.Context, req *api.AuthorizeUserReque
 			Token:     token.Token,
 			ExpiredAt: token.ExpiredAt.Unix(),
 		},
+	}, nil
+}
+
+func (s *Service) UpdateUserInfo(ctx context.Context, req *api.UpdateUserInfoRequest) (*api.UpdateUserInfoResponse, error) {
+	logger := s.log.WithName("UpdateUserInfo").WithValues("assigner", req.AssignerId, "employee", req.UpdateData.UserId)
+	user, err := s.store.GetUserInfoById(ctx, req.UpdateData.UserId)
+	if err != nil {
+		logger.Error(err, "store | GetUserInfoById")
+		return nil, err
+	}
+	switch req.AssignerRole {
+	case api.UserRole_HR:
+		if req.UpdateData.Department != helper.EmptyString {
+			user.Department.String = req.UpdateData.Department
+		}
+		if req.UpdateData.Role.String() != helper.EmptyString {
+			user.Role.String = req.UpdateData.Role.String()
+		}
+		if req.UpdateData.Position != helper.EmptyString {
+			user.Position.String = req.UpdateData.Position
+		}
+	case api.UserRole_OTHER,
+		api.UserRole_MANAGER:
+		return nil, errorz.ErrAssignerRoleNotAllowed
+	default:
+		break
+	}
+	if req.UpdateData.Address != helper.EmptyString {
+		user.Address.String = req.UpdateData.Address
+	}
+	if req.UpdateData.Phone != helper.EmptyString {
+		user.Phone.String = req.UpdateData.Phone
+	}
+	if req.UpdateData.FrontCard != helper.EmptyString {
+		user.FrontCard.String = req.UpdateData.FrontCard
+	}
+	if req.UpdateData.BackCard != helper.EmptyString {
+		user.BackCard.String = req.UpdateData.BackCard
+	}
+	if _, err = s.store.UpdateUserInfoById(ctx, store.UpdateUserInfoByIdParams{
+		Phone:      user.Phone,
+		Department: user.Department,
+		Address:    user.Address,
+		Role:       user.Role,
+		ID:         user.ID,
+		Position:   user.Position,
+		FrontCard:  user.FrontCard,
+		BackCard:   user.BackCard,
+	}); err != nil {
+		logger.Error(err, "store | UpdateUserInfoById")
+		return nil, err
+	}
+	return &api.UpdateUserInfoResponse{
+		Code:    http.StatusOK,
+		Message: "success",
+		Data:    toApiUser([]store.User{user})[0],
 	}, nil
 }

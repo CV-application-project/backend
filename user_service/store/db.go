@@ -30,6 +30,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createNewUserTokenByUserIdStmt, err = db.PrepareContext(ctx, createNewUserTokenByUserId); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateNewUserTokenByUserId: %w", err)
 	}
+	if q.getAllUsersStmt, err = db.PrepareContext(ctx, getAllUsers); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllUsers: %w", err)
+	}
 	if q.getUserByUsernameOrEmailStmt, err = db.PrepareContext(ctx, getUserByUsernameOrEmail); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByUsernameOrEmail: %w", err)
 	}
@@ -38,6 +41,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.getUserTokenByUserIdStmt, err = db.PrepareContext(ctx, getUserTokenByUserId); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserTokenByUserId: %w", err)
+	}
+	if q.getUsersByDepartmentStmt, err = db.PrepareContext(ctx, getUsersByDepartment); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUsersByDepartment: %w", err)
 	}
 	if q.updateUserInfoByIdStmt, err = db.PrepareContext(ctx, updateUserInfoById); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUserInfoById: %w", err)
@@ -57,6 +63,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createNewUserTokenByUserIdStmt: %w", cerr)
 		}
 	}
+	if q.getAllUsersStmt != nil {
+		if cerr := q.getAllUsersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllUsersStmt: %w", cerr)
+		}
+	}
 	if q.getUserByUsernameOrEmailStmt != nil {
 		if cerr := q.getUserByUsernameOrEmailStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserByUsernameOrEmailStmt: %w", cerr)
@@ -70,6 +81,11 @@ func (q *Queries) Close() error {
 	if q.getUserTokenByUserIdStmt != nil {
 		if cerr := q.getUserTokenByUserIdStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserTokenByUserIdStmt: %w", cerr)
+		}
+	}
+	if q.getUsersByDepartmentStmt != nil {
+		if cerr := q.getUsersByDepartmentStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUsersByDepartmentStmt: %w", cerr)
 		}
 	}
 	if q.updateUserInfoByIdStmt != nil {
@@ -118,9 +134,11 @@ type Queries struct {
 	tx                             *sql.Tx
 	createNewUserInfoStmt          *sql.Stmt
 	createNewUserTokenByUserIdStmt *sql.Stmt
+	getAllUsersStmt                *sql.Stmt
 	getUserByUsernameOrEmailStmt   *sql.Stmt
 	getUserInfoByIdStmt            *sql.Stmt
 	getUserTokenByUserIdStmt       *sql.Stmt
+	getUsersByDepartmentStmt       *sql.Stmt
 	updateUserInfoByIdStmt         *sql.Stmt
 }
 
@@ -130,9 +148,11 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		tx:                             tx,
 		createNewUserInfoStmt:          q.createNewUserInfoStmt,
 		createNewUserTokenByUserIdStmt: q.createNewUserTokenByUserIdStmt,
+		getAllUsersStmt:                q.getAllUsersStmt,
 		getUserByUsernameOrEmailStmt:   q.getUserByUsernameOrEmailStmt,
 		getUserInfoByIdStmt:            q.getUserInfoByIdStmt,
 		getUserTokenByUserIdStmt:       q.getUserTokenByUserIdStmt,
+		getUsersByDepartmentStmt:       q.getUsersByDepartmentStmt,
 		updateUserInfoByIdStmt:         q.updateUserInfoByIdStmt,
 	}
 }

@@ -1,1 +1,1 @@
-alter table user add unique key (username);
+alter table user add unique key (employee_id);

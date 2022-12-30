@@ -49,3 +49,53 @@ message AuthorizeUserResponse {
   string message = 2;
   UserToken data = 3;
 }
+
+message UpdateUserInfoRequest {
+  int64 assigner_id = 1 [(validate.rules).int64 = {gt: 0}];
+  UserRole assigner_role = 2 [(validate.rules).enum = {not_in: [0, 2]}];
+  UpdateInfo update_data = 3 [(validate.rules).message = {required: true}];
+}
+
+message UpdateInfo {
+  int64 user_id = 1;
+  string phone = 2;
+  string address = 3;
+  string department = 4;
+  string position = 5;
+  UserRole role = 6;
+  string data = 7;
+  string front_card = 8;
+  string back_card = 9;
+}
+
+message UpdateUserInfoResponse {
+  int64 code = 1;
+  string message = 2;
+  User data = 3;
+}
+
+message ExportUsersByDepartmentRequest {
+  int64 assigner_id = 1 [(validate.rules).int64 = {gt: 0}];
+  UserRole assigner_role = 2 [(validate.rules).enum = {not_in: [0, 2]}];
+  string assigner_department = 3 [(validate.rules).string = {ignore_empty: false}];
+}
+
+message ExportUsersByDepartmentResponse {
+  int64 code = 1;
+  string message = 2;
+  repeated User data = 3;
+}
+
+message User {
+  string employee_id = 1;
+  string name = 2;
+  string phone = 3;
+  string gender = 4;
+  string address = 5;
+  string department = 6;
+  string position = 7;
+  string role = 8;
+  string email = 9;
+  string front_card = 10;
+  string back_card = 11;
+}

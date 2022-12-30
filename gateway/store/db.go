@@ -33,6 +33,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getUserInfoByUsernameOrEmailStmt, err = db.PrepareContext(ctx, getUserInfoByUsernameOrEmail); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserInfoByUsernameOrEmail: %w", err)
 	}
+	if q.updateUserCardStmt, err = db.PrepareContext(ctx, updateUserCard); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUserCard: %w", err)
+	}
 	if q.updateUserInfoTokenByUserIdStmt, err = db.PrepareContext(ctx, updateUserInfoTokenByUserId); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUserInfoTokenByUserId: %w", err)
 	}
@@ -54,6 +57,11 @@ func (q *Queries) Close() error {
 	if q.getUserInfoByUsernameOrEmailStmt != nil {
 		if cerr := q.getUserInfoByUsernameOrEmailStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserInfoByUsernameOrEmailStmt: %w", cerr)
+		}
+	}
+	if q.updateUserCardStmt != nil {
+		if cerr := q.updateUserCardStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserCardStmt: %w", cerr)
 		}
 	}
 	if q.updateUserInfoTokenByUserIdStmt != nil {
@@ -103,6 +111,7 @@ type Queries struct {
 	createUserInfoStmt               *sql.Stmt
 	getUserInfoByTokenStmt           *sql.Stmt
 	getUserInfoByUsernameOrEmailStmt *sql.Stmt
+	updateUserCardStmt               *sql.Stmt
 	updateUserInfoTokenByUserIdStmt  *sql.Stmt
 }
 
@@ -113,6 +122,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createUserInfoStmt:               q.createUserInfoStmt,
 		getUserInfoByTokenStmt:           q.getUserInfoByTokenStmt,
 		getUserInfoByUsernameOrEmailStmt: q.getUserInfoByUsernameOrEmailStmt,
+		updateUserCardStmt:               q.updateUserCardStmt,
 		updateUserInfoTokenByUserIdStmt:  q.updateUserInfoTokenByUserIdStmt,
 	}
 }

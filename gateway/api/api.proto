@@ -20,16 +20,4 @@ service GatewayService {
       body: "*"
     };
   }
-  rpc UpdateCitizenIdentityCard(UpdateCitizenIdentityCardRequest) returns (UpdateCitizenIdentityCardResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/user/citizen-card",
-      body: "*"
-    };
-  }
-  rpc RegisterCICForUser(RegisterCICForUserRequest) returns (RegisterCICForUserResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/cic/register",
-      body: "*"
-    };
-  }
 }

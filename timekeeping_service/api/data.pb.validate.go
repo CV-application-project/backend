@@ -378,9 +378,10 @@ var _ interface {
 	ErrorName() string
 } = TimekeepingHistoryValidationError{}
 
-// Validate checks the field values on Data with the rules defined in the proto
-// definition for this message. If any rules are violated, an error is returned.
-func (m *Data) Validate() error {
+// Validate checks the field values on HistoryDetail with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *HistoryDetail) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -396,7 +397,7 @@ func (m *Data) Validate() error {
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return DataValidationError{
+				return HistoryDetailValidationError{
 					field:  fmt.Sprintf("Details[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -409,9 +410,9 @@ func (m *Data) Validate() error {
 	return nil
 }
 
-// DataValidationError is the validation error returned by Data.Validate if the
-// designated constraints aren't met.
-type DataValidationError struct {
+// HistoryDetailValidationError is the validation error returned by
+// HistoryDetail.Validate if the designated constraints aren't met.
+type HistoryDetailValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -419,22 +420,22 @@ type DataValidationError struct {
 }
 
 // Field function returns field value.
-func (e DataValidationError) Field() string { return e.field }
+func (e HistoryDetailValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e DataValidationError) Reason() string { return e.reason }
+func (e HistoryDetailValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e DataValidationError) Cause() error { return e.cause }
+func (e HistoryDetailValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e DataValidationError) Key() bool { return e.key }
+func (e HistoryDetailValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e DataValidationError) ErrorName() string { return "DataValidationError" }
+func (e HistoryDetailValidationError) ErrorName() string { return "HistoryDetailValidationError" }
 
 // Error satisfies the builtin error interface
-func (e DataValidationError) Error() string {
+func (e HistoryDetailValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -446,14 +447,14 @@ func (e DataValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sData.%s: %s%s",
+		"invalid %sHistoryDetail.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = DataValidationError{}
+var _ error = HistoryDetailValidationError{}
 
 var _ interface {
 	Field() string
@@ -461,7 +462,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = DataValidationError{}
+} = HistoryDetailValidationError{}
 
 // Validate checks the field values on CreateHistoryOfUserRequest with the
 // rules defined in the proto definition for this message. If any rules are
@@ -631,27 +632,6 @@ func (m *UpdateHistoryOfUserRequest) Validate() error {
 		}
 	}
 
-	if val := m.GetDay(); val <= 0 || val >= 32 {
-		return UpdateHistoryOfUserRequestValidationError{
-			field:  "Day",
-			reason: "value must be inside range (0, 32)",
-		}
-	}
-
-	if val := m.GetMonth(); val <= 0 || val >= 13 {
-		return UpdateHistoryOfUserRequestValidationError{
-			field:  "Month",
-			reason: "value must be inside range (0, 13)",
-		}
-	}
-
-	if m.GetYear() <= 0 {
-		return UpdateHistoryOfUserRequestValidationError{
-			field:  "Year",
-			reason: "value must be greater than 0",
-		}
-	}
-
 	// no validation rules for StartTime
 
 	// no validation rules for EndTime
@@ -789,23 +769,34 @@ var _ interface {
 	ErrorName() string
 } = UpdateHistoryOfUserResponseValidationError{}
 
-// Validate checks the field values on Data_Line with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *Data_Line) Validate() error {
+// Validate checks the field values on UpsertHistoryOfUserRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpsertHistoryOfUserRequest) Validate() error {
 	if m == nil {
 		return nil
 	}
 
-	// no validation rules for StartTime
+	if m.GetUserId() < 0 {
+		return UpsertHistoryOfUserRequestValidationError{
+			field:  "UserId",
+			reason: "value must be greater than or equal to 0",
+		}
+	}
 
-	// no validation rules for EndTime
+	if m.GetLockTime() <= 0 {
+		return UpsertHistoryOfUserRequestValidationError{
+			field:  "LockTime",
+			reason: "value must be greater than 0",
+		}
+	}
 
 	return nil
 }
 
-// Data_LineValidationError is the validation error returned by
-// Data_Line.Validate if the designated constraints aren't met.
-type Data_LineValidationError struct {
+// UpsertHistoryOfUserRequestValidationError is the validation error returned
+// by UpsertHistoryOfUserRequest.Validate if the designated constraints aren't met.
+type UpsertHistoryOfUserRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -813,22 +804,24 @@ type Data_LineValidationError struct {
 }
 
 // Field function returns field value.
-func (e Data_LineValidationError) Field() string { return e.field }
+func (e UpsertHistoryOfUserRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e Data_LineValidationError) Reason() string { return e.reason }
+func (e UpsertHistoryOfUserRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e Data_LineValidationError) Cause() error { return e.cause }
+func (e UpsertHistoryOfUserRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e Data_LineValidationError) Key() bool { return e.key }
+func (e UpsertHistoryOfUserRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e Data_LineValidationError) ErrorName() string { return "Data_LineValidationError" }
+func (e UpsertHistoryOfUserRequestValidationError) ErrorName() string {
+	return "UpsertHistoryOfUserRequestValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e Data_LineValidationError) Error() string {
+func (e UpsertHistoryOfUserRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -840,14 +833,14 @@ func (e Data_LineValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sData_Line.%s: %s%s",
+		"invalid %sUpsertHistoryOfUserRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = Data_LineValidationError{}
+var _ error = UpsertHistoryOfUserRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -855,4 +848,302 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = Data_LineValidationError{}
+} = UpsertHistoryOfUserRequestValidationError{}
+
+// Validate checks the field values on UpsertHistoryOfUserResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpsertHistoryOfUserResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	// no validation rules for TotalTime
+
+	return nil
+}
+
+// UpsertHistoryOfUserResponseValidationError is the validation error returned
+// by UpsertHistoryOfUserResponse.Validate if the designated constraints
+// aren't met.
+type UpsertHistoryOfUserResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpsertHistoryOfUserResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpsertHistoryOfUserResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpsertHistoryOfUserResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpsertHistoryOfUserResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpsertHistoryOfUserResponseValidationError) ErrorName() string {
+	return "UpsertHistoryOfUserResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpsertHistoryOfUserResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpsertHistoryOfUserResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpsertHistoryOfUserResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpsertHistoryOfUserResponseValidationError{}
+
+// Validate checks the field values on GetHistoryByListRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetHistoryByListRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// GetHistoryByListRequestValidationError is the validation error returned by
+// GetHistoryByListRequest.Validate if the designated constraints aren't met.
+type GetHistoryByListRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetHistoryByListRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetHistoryByListRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetHistoryByListRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetHistoryByListRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetHistoryByListRequestValidationError) ErrorName() string {
+	return "GetHistoryByListRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetHistoryByListRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetHistoryByListRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetHistoryByListRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetHistoryByListRequestValidationError{}
+
+// Validate checks the field values on GetHistoryByListResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetHistoryByListResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	for idx, item := range m.GetData() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetHistoryByListResponseValidationError{
+					field:  fmt.Sprintf("Data[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// GetHistoryByListResponseValidationError is the validation error returned by
+// GetHistoryByListResponse.Validate if the designated constraints aren't met.
+type GetHistoryByListResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetHistoryByListResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetHistoryByListResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetHistoryByListResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetHistoryByListResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetHistoryByListResponseValidationError) ErrorName() string {
+	return "GetHistoryByListResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetHistoryByListResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetHistoryByListResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetHistoryByListResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetHistoryByListResponseValidationError{}
+
+// Validate checks the field values on HistoryDetail_Line with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *HistoryDetail_Line) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for StartTime
+
+	// no validation rules for EndTime
+
+	return nil
+}
+
+// HistoryDetail_LineValidationError is the validation error returned by
+// HistoryDetail_Line.Validate if the designated constraints aren't met.
+type HistoryDetail_LineValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HistoryDetail_LineValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HistoryDetail_LineValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HistoryDetail_LineValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HistoryDetail_LineValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HistoryDetail_LineValidationError) ErrorName() string {
+	return "HistoryDetail_LineValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e HistoryDetail_LineValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHistoryDetail_Line.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HistoryDetail_LineValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HistoryDetail_LineValidationError{}

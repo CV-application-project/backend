@@ -9,7 +9,7 @@ import (
 func (s *Service) convertToAPIHistory(histories []store.TimekeepingHistory) []*api.TimekeepingHistory {
 	convertedList := make([]*api.TimekeepingHistory, 0, len(histories))
 	for _, history := range histories {
-		var data *api.Data
+		var data *api.HistoryDetail
 		if err := json.Unmarshal([]byte(history.Data.String), &data); err != nil {
 			s.log.Error(err, "Can not unmarshal data")
 			return nil
@@ -38,8 +38,8 @@ func (s *Service) getOption(req *api.UpdateHistoryOfUserRequest) option {
 	return TypeUnspecified
 }
 
-func (s *Service) getHistoryData(history store.TimekeepingHistory) *api.Data {
-	var data api.Data
+func (s *Service) getHistoryData(history store.TimekeepingHistory) *api.HistoryDetail {
+	var data api.HistoryDetail
 	if err := json.Unmarshal([]byte(history.Data.String), &data); err != nil {
 		return nil
 	}

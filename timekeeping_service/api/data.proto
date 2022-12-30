@@ -27,10 +27,10 @@ message TimekeepingHistory {
   uint32 day = 2 [(validate.rules).uint32 = {gt: 0, lt: 32}];
   uint32 month = 3 [(validate.rules).uint32 = {gt: 0, lt: 13}];
   uint32 year = 4 [(validate.rules).uint32 = {gt: 0}];
-  Data data = 5;
+  HistoryDetail data = 5;
 }
 
-message Data {
+message HistoryDetail {
   uint64 total_time = 1;
   int64 start_time = 2;
   int64 end_time = 3;
@@ -53,15 +53,33 @@ message CreateHistoryOfUserResponse {
 
 message UpdateHistoryOfUserRequest {
   int64 user_id = 1 [(validate.rules).int64 = {gt: 0}];
-  uint32 day = 2 [(validate.rules).uint32 = {gt: 0, lt: 32}];
-  uint32 month = 3 [(validate.rules).uint32 = {gt: 0, lt: 13}];
-  uint32 year = 4 [(validate.rules).uint32 = {gt: 0}];
-  int64 start_time = 5;
-  int64 end_time = 6;
+  int64 start_time = 2;
+  int64 end_time = 3;
 }
 
 message UpdateHistoryOfUserResponse {
   int64 code = 1;
   string message = 2;
   int64 total_time = 3;
+}
+
+message UpsertHistoryOfUserRequest {
+  int64 user_id = 1[(validate.rules).int64 = {gte: 0}];
+  int64 lock_time = 2 [(validate.rules).int64 = {gt: 0}];
+}
+
+message UpsertHistoryOfUserResponse {
+  int64 code = 1;
+  string message = 2;
+  int64 total_time = 3;
+}
+
+message GetHistoryByListRequest {
+  repeated string employee_ids = 1;
+}
+
+message GetHistoryByListResponse {
+  int64 code = 1;
+  string message = 2;
+  repeated TimekeepingHistory data = 3;
 }

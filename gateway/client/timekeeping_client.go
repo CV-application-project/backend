@@ -12,6 +12,7 @@ type TimekeepingClient interface {
 	GetHistoryOfUser(ctx context.Context, req *api.GetHistoryOfUserRequest) (*api.GetHistoryOfUserResponse, error)
 	CreateHistoryOfUser(ctx context.Context, req *api.CreateHistoryOfUserRequest) (*api.CreateHistoryOfUserResponse, error)
 	UpdateHistoryOfUser(ctx context.Context, req *api.UpdateHistoryOfUserRequest) (*api.UpdateHistoryOfUserResponse, error)
+	UpsertHistoryOfUser(ctx context.Context, req *api.UpsertHistoryOfUserRequest) (*api.UpsertHistoryOfUserResponse, error)
 }
 
 type timekeepingClient struct {
@@ -40,4 +41,8 @@ func (c *timekeepingClient) CreateHistoryOfUser(ctx context.Context, req *api.Cr
 
 func (c *timekeepingClient) UpdateHistoryOfUser(ctx context.Context, req *api.UpdateHistoryOfUserRequest) (*api.UpdateHistoryOfUserResponse, error) {
 	return c.client.UpdateHistoryOfUser(ctx, req)
+}
+
+func (c *timekeepingClient) UpsertHistoryOfUser(ctx context.Context, req *api.UpsertHistoryOfUserRequest) (*api.UpsertHistoryOfUserResponse, error) {
+	return c.client.UpsertHistoryOfUser(ctx, req)
 }

@@ -12,7 +12,7 @@ import (
 type User struct {
 	ID         int64          `json:"id"`
 	Name       string         `json:"name"`
-	Username   string         `json:"username"`
+	EmployeeID string         `json:"employee_id"`
 	Password   string         `json:"password"`
 	Phone      sql.NullString `json:"phone"`
 	Address    sql.NullString `json:"address"`
@@ -24,6 +24,8 @@ type User struct {
 	CreatedAt  time.Time      `json:"created_at"`
 	UpdatedAt  time.Time      `json:"updated_at"`
 	Email      string         `json:"email"`
+	FrontCard  sql.NullString `json:"front_card"`
+	BackCard   sql.NullString `json:"back_card"`
 }
 
 type UserToken struct {

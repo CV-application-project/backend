@@ -25,6 +25,8 @@ type TimekeepingServiceClient interface {
 	GetHistoryOfUser(ctx context.Context, in *GetHistoryOfUserRequest, opts ...grpc.CallOption) (*GetHistoryOfUserResponse, error)
 	CreateHistoryOfUser(ctx context.Context, in *CreateHistoryOfUserRequest, opts ...grpc.CallOption) (*CreateHistoryOfUserResponse, error)
 	UpdateHistoryOfUser(ctx context.Context, in *UpdateHistoryOfUserRequest, opts ...grpc.CallOption) (*UpdateHistoryOfUserResponse, error)
+	UpsertHistoryOfUser(ctx context.Context, in *UpsertHistoryOfUserRequest, opts ...grpc.CallOption) (*UpsertHistoryOfUserResponse, error)
+	GetHistoryByList(ctx context.Context, in *GetHistoryByListRequest, opts ...grpc.CallOption) (*GetHistoryByListResponse, error)
 }
 
 type timekeepingServiceClient struct {
@@ -62,6 +64,24 @@ func (c *timekeepingServiceClient) UpdateHistoryOfUser(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *timekeepingServiceClient) UpsertHistoryOfUser(ctx context.Context, in *UpsertHistoryOfUserRequest, opts ...grpc.CallOption) (*UpsertHistoryOfUserResponse, error) {
+	out := new(UpsertHistoryOfUserResponse)
+	err := c.cc.Invoke(ctx, "/timekeeping_service.api.TimekeepingService/UpsertHistoryOfUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *timekeepingServiceClient) GetHistoryByList(ctx context.Context, in *GetHistoryByListRequest, opts ...grpc.CallOption) (*GetHistoryByListResponse, error) {
+	out := new(GetHistoryByListResponse)
+	err := c.cc.Invoke(ctx, "/timekeeping_service.api.TimekeepingService/GetHistoryByList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TimekeepingServiceServer is the server API for TimekeepingService service.
 // All implementations must embed UnimplementedTimekeepingServiceServer
 // for forward compatibility
@@ -69,6 +89,8 @@ type TimekeepingServiceServer interface {
 	GetHistoryOfUser(context.Context, *GetHistoryOfUserRequest) (*GetHistoryOfUserResponse, error)
 	CreateHistoryOfUser(context.Context, *CreateHistoryOfUserRequest) (*CreateHistoryOfUserResponse, error)
 	UpdateHistoryOfUser(context.Context, *UpdateHistoryOfUserRequest) (*UpdateHistoryOfUserResponse, error)
+	UpsertHistoryOfUser(context.Context, *UpsertHistoryOfUserRequest) (*UpsertHistoryOfUserResponse, error)
+	GetHistoryByList(context.Context, *GetHistoryByListRequest) (*GetHistoryByListResponse, error)
 	mustEmbedUnimplementedTimekeepingServiceServer()
 }
 
@@ -84,6 +106,12 @@ func (UnimplementedTimekeepingServiceServer) CreateHistoryOfUser(context.Context
 }
 func (UnimplementedTimekeepingServiceServer) UpdateHistoryOfUser(context.Context, *UpdateHistoryOfUserRequest) (*UpdateHistoryOfUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateHistoryOfUser not implemented")
+}
+func (UnimplementedTimekeepingServiceServer) UpsertHistoryOfUser(context.Context, *UpsertHistoryOfUserRequest) (*UpsertHistoryOfUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertHistoryOfUser not implemented")
+}
+func (UnimplementedTimekeepingServiceServer) GetHistoryByList(context.Context, *GetHistoryByListRequest) (*GetHistoryByListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetHistoryByList not implemented")
 }
 func (UnimplementedTimekeepingServiceServer) mustEmbedUnimplementedTimekeepingServiceServer() {}
 
@@ -152,6 +180,42 @@ func _TimekeepingService_UpdateHistoryOfUser_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TimekeepingService_UpsertHistoryOfUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertHistoryOfUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TimekeepingServiceServer).UpsertHistoryOfUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/timekeeping_service.api.TimekeepingService/UpsertHistoryOfUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TimekeepingServiceServer).UpsertHistoryOfUser(ctx, req.(*UpsertHistoryOfUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TimekeepingService_GetHistoryByList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetHistoryByListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TimekeepingServiceServer).GetHistoryByList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/timekeeping_service.api.TimekeepingService/GetHistoryByList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TimekeepingServiceServer).GetHistoryByList(ctx, req.(*GetHistoryByListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TimekeepingService_ServiceDesc is the grpc.ServiceDesc for TimekeepingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +234,14 @@ var TimekeepingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateHistoryOfUser",
 			Handler:    _TimekeepingService_UpdateHistoryOfUser_Handler,
+		},
+		{
+			MethodName: "UpsertHistoryOfUser",
+			Handler:    _TimekeepingService_UpsertHistoryOfUser_Handler,
+		},
+		{
+			MethodName: "GetHistoryByList",
+			Handler:    _TimekeepingService_GetHistoryByList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

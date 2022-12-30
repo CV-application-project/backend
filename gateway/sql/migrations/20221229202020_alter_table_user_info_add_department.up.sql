@@ -1,0 +1,1 @@
+alter table user_info add department nvarchar(255);

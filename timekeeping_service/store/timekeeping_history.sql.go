@@ -34,8 +34,48 @@ func (q *Queries) CreateTimekeepingHistory(ctx context.Context, arg CreateTimeke
 	)
 }
 
+const getHistoryByList = `-- name: GetHistoryByList :many
+select id, user_id, day, month, year, is_active, data, created_at, updated_at, mode
+from timekeeping_history
+where user_id in (?)
+`
+
+func (q *Queries) GetHistoryByList(ctx context.Context, userID int64) ([]TimekeepingHistory, error) {
+	rows, err := q.query(ctx, q.getHistoryByListStmt, getHistoryByList, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []TimekeepingHistory{}
+	for rows.Next() {
+		var i TimekeepingHistory
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Day,
+			&i.Month,
+			&i.Year,
+			&i.IsActive,
+			&i.Data,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Mode,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getTimekeepingHistoryAtMonthByUserId = `-- name: GetTimekeepingHistoryAtMonthByUserId :many
-select id, user_id, day, month, year, is_active, data, created_at, updated_at
+select id, user_id, day, month, year, is_active, data, created_at, updated_at, mode
 from timekeeping_history
 where ` + "`" + `user_id` + "`" + ` = ?
   and ` + "`" + `month` + "`" + ` = ?
@@ -68,6 +108,7 @@ func (q *Queries) GetTimekeepingHistoryAtMonthByUserId(ctx context.Context, arg 
 			&i.Data,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Mode,
 		); err != nil {
 			return nil, err
 		}
@@ -83,8 +124,10 @@ func (q *Queries) GetTimekeepingHistoryAtMonthByUserId(ctx context.Context, arg 
 }
 
 const getTimekeepingHistoryByDuration = `-- name: GetTimekeepingHistoryByDuration :many
-select id, user_id, day, month, year, is_active, data, created_at, updated_at from timekeeping_history
-where ` + "`" + `user_id` + "`" + ` = ? and ` + "`" + `created_at` + "`" + ` between ? and ?
+select id, user_id, day, month, year, is_active, data, created_at, updated_at, mode
+from timekeeping_history
+where ` + "`" + `user_id` + "`" + ` = ?
+  and ` + "`" + `created_at` + "`" + ` between ? and ?
 `
 
 type GetTimekeepingHistoryByDurationParams struct {
@@ -112,6 +155,7 @@ func (q *Queries) GetTimekeepingHistoryByDuration(ctx context.Context, arg GetTi
 			&i.Data,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Mode,
 		); err != nil {
 			return nil, err
 		}
@@ -127,7 +171,7 @@ func (q *Queries) GetTimekeepingHistoryByDuration(ctx context.Context, arg GetTi
 }
 
 const getTimekeepingHistoryInDayByUserId = `-- name: GetTimekeepingHistoryInDayByUserId :one
-select id, user_id, day, month, year, is_active, data, created_at, updated_at
+select id, user_id, day, month, year, is_active, data, created_at, updated_at, mode
 from timekeeping_history
 where ` + "`" + `user_id` + "`" + ` = ?
   and ` + "`" + `day` + "`" + ` = ?
@@ -161,12 +205,13 @@ func (q *Queries) GetTimekeepingHistoryInDayByUserId(ctx context.Context, arg Ge
 		&i.Data,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Mode,
 	)
 	return i, err
 }
 
 const getTimekeepingHistoryInYearByUserId = `-- name: GetTimekeepingHistoryInYearByUserId :many
-select id, user_id, day, month, year, is_active, data, created_at, updated_at
+select id, user_id, day, month, year, is_active, data, created_at, updated_at, mode
 from timekeeping_history
 where ` + "`" + `user_id` + "`" + ` = ?
   and ` + "`" + `year` + "`" + ` = ?
@@ -196,6 +241,7 @@ func (q *Queries) GetTimekeepingHistoryInYearByUserId(ctx context.Context, arg G
 			&i.Data,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Mode,
 		); err != nil {
 			return nil, err
 		}
@@ -218,6 +264,7 @@ where ` + "`" + `user_id` + "`" + ` = ?
   and ` + "`" + `month` + "`" + ` = ?
   and ` + "`" + `year` + "`" + ` = ?
   and is_active = true
+  and mode = abs(mode - 1)
 `
 
 type UpdateTimekeepingHistoryInDayParams struct {

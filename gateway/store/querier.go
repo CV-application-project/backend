@@ -13,6 +13,7 @@ type Querier interface {
 	CreateUserInfo(ctx context.Context, arg CreateUserInfoParams) (sql.Result, error)
 	GetUserInfoByToken(ctx context.Context, token string) (UserInfo, error)
 	GetUserInfoByUsernameOrEmail(ctx context.Context, arg GetUserInfoByUsernameOrEmailParams) (UserInfo, error)
+	UpdateUserCard(ctx context.Context, arg UpdateUserCardParams) (sql.Result, error)
 	UpdateUserInfoTokenByUserId(ctx context.Context, arg UpdateUserInfoTokenByUserIdParams) (sql.Result, error)
 	Close() error
 }

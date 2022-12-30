@@ -19,4 +19,5 @@ type TimekeepingHistory struct {
 	Data      sql.NullString `json:"data"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
+	Mode      sql.NullBool   `json:"mode"`
 }

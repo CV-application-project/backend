@@ -1,8 +1,8 @@
 package service
 
 import (
+	"Backend-Server/common/ctx_key"
 	cvApi "Backend-Server/cv_service/api"
-	"Backend-Server/gateway/api"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -12,32 +12,8 @@ import (
 	"net/http"
 )
 
-func (s *Service) RegisterCICForUser(ctx context.Context, req *api.RegisterCICForUserRequest) (*api.RegisterCICForUserResponse, error) {
-	if err := req.Validate(); err != nil {
-		return nil, err
-	}
-	logger := s.log.WithName("RegisterCICForUser").WithValues("user_id", req.UserId)
-	if req.Front == nil || req.Back == nil {
-		logger.Info("image is empty")
-		return nil, nil
-	}
-	_, err := s.cvClient.RegisterCICForUser(ctx, &cvApi.RegisterCICForUserRequest{
-		UserId: req.UserId,
-		Front:  req.Front,
-		Back:   req.Back,
-	})
-	if err != nil {
-		logger.Error(err, "cvClient | RegisterCICForUser")
-		return nil, err
-	}
-	return &api.RegisterCICForUserResponse{
-		Code:    http.StatusOK,
-		Message: "success",
-	}, nil
-}
-
-func (s *Service) HTTPRegisterCICForUser(res http.ResponseWriter, req *http.Request) error {
-	logger := s.log.WithName("HTTPRegisterCICForUser")
+func (s *Service) HTTPUpsertCICForUser(res http.ResponseWriter, req *http.Request) error {
+	logger := s.log.WithName("HTTPUpsertCICForUser")
 	if req.Method != "POST" {
 		err := errors.New("invalid HTTP method")
 		logger.Error(err, "POST")
@@ -53,7 +29,7 @@ func (s *Service) HTTPRegisterCICForUser(res http.ResponseWriter, req *http.Requ
 		return err
 	}
 	defer frontImageFile.Close()
-	userId := req.Context().Value(ContextUserId)
+	userId := req.Context().Value(ctx_key.ContextUserId)
 	logger.WithValues("user_id", userId)
 	frontData := bytes.NewBuffer(nil)
 	if _, err = io.Copy(frontData, frontImageFile); err != nil {
@@ -71,7 +47,7 @@ func (s *Service) HTTPRegisterCICForUser(res http.ResponseWriter, req *http.Requ
 		logger.Error(err, "Copy")
 		return err
 	}
-	resp, err := s.RegisterCICForUser(context.Background(), &api.RegisterCICForUserRequest{
+	resp, err := s.cvClient.UpsertCICForUser(context.Background(), &cvApi.UpsertCICForUserRequest{
 		UserId: cast.ToInt64(userId),
 		Front:  frontData.Bytes(),
 		Back:   backData.Bytes(),

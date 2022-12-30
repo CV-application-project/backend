@@ -11,12 +11,13 @@ import (
 )
 
 const createNewUserInfo = `-- name: CreateNewUserInfo :execresult
-insert into user (name, username, password, phone, address, gender, department, position, role, data, email) value (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+insert into user (name, employee_id, password, phone, address, gender, department, position, role, data, email,
+                  front_card, back_card) value (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type CreateNewUserInfoParams struct {
 	Name       string         `json:"name"`
-	Username   string         `json:"username"`
+	EmployeeID string         `json:"employee_id"`
 	Password   string         `json:"password"`
 	Phone      sql.NullString `json:"phone"`
 	Address    sql.NullString `json:"address"`
@@ -26,12 +27,14 @@ type CreateNewUserInfoParams struct {
 	Role       sql.NullString `json:"role"`
 	Data       sql.NullString `json:"data"`
 	Email      string         `json:"email"`
+	FrontCard  sql.NullString `json:"front_card"`
+	BackCard   sql.NullString `json:"back_card"`
 }
 
 func (q *Queries) CreateNewUserInfo(ctx context.Context, arg CreateNewUserInfoParams) (sql.Result, error) {
 	return q.exec(ctx, q.createNewUserInfoStmt, createNewUserInfo,
 		arg.Name,
-		arg.Username,
+		arg.EmployeeID,
 		arg.Password,
 		arg.Phone,
 		arg.Address,
@@ -41,25 +44,77 @@ func (q *Queries) CreateNewUserInfo(ctx context.Context, arg CreateNewUserInfoPa
 		arg.Role,
 		arg.Data,
 		arg.Email,
+		arg.FrontCard,
+		arg.BackCard,
 	)
 }
 
+const getAllUsers = `-- name: GetAllUsers :many
+select id, name, employee_id, password, phone, address, gender, department, position, role, data, created_at, updated_at, email, front_card, back_card
+from user
+where role != 'HR'
+`
+
+func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
+	rows, err := q.query(ctx, q.getAllUsersStmt, getAllUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []User{}
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.EmployeeID,
+			&i.Password,
+			&i.Phone,
+			&i.Address,
+			&i.Gender,
+			&i.Department,
+			&i.Position,
+			&i.Role,
+			&i.Data,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Email,
+			&i.FrontCard,
+			&i.BackCard,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserByUsernameOrEmail = `-- name: GetUserByUsernameOrEmail :one
-select id, name, username, password, phone, address, gender, department, position, role, data, created_at, updated_at, email from user where username = ? or email = ? limit 1
+select id, name, employee_id, password, phone, address, gender, department, position, role, data, created_at, updated_at, email, front_card, back_card
+from user
+where employee_id = ?
+   or email = ?
+limit 1
 `
 
 type GetUserByUsernameOrEmailParams struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	EmployeeID string `json:"employee_id"`
+	Email      string `json:"email"`
 }
 
 func (q *Queries) GetUserByUsernameOrEmail(ctx context.Context, arg GetUserByUsernameOrEmailParams) (User, error) {
-	row := q.queryRow(ctx, q.getUserByUsernameOrEmailStmt, getUserByUsernameOrEmail, arg.Username, arg.Email)
+	row := q.queryRow(ctx, q.getUserByUsernameOrEmailStmt, getUserByUsernameOrEmail, arg.EmployeeID, arg.Email)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Username,
+		&i.EmployeeID,
 		&i.Password,
 		&i.Phone,
 		&i.Address,
@@ -71,12 +126,17 @@ func (q *Queries) GetUserByUsernameOrEmail(ctx context.Context, arg GetUserByUse
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Email,
+		&i.FrontCard,
+		&i.BackCard,
 	)
 	return i, err
 }
 
 const getUserInfoById = `-- name: GetUserInfoById :one
-select id, name, username, password, phone, address, gender, department, position, role, data, created_at, updated_at, email from user where id = ? limit 1
+select id, name, employee_id, password, phone, address, gender, department, position, role, data, created_at, updated_at, email, front_card, back_card
+from user
+where id = ?
+limit 1
 `
 
 func (q *Queries) GetUserInfoById(ctx context.Context, id int64) (User, error) {
@@ -85,7 +145,7 @@ func (q *Queries) GetUserInfoById(ctx context.Context, id int64) (User, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Username,
+		&i.EmployeeID,
 		&i.Password,
 		&i.Phone,
 		&i.Address,
@@ -97,19 +157,91 @@ func (q *Queries) GetUserInfoById(ctx context.Context, id int64) (User, error) {
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Email,
+		&i.FrontCard,
+		&i.BackCard,
 	)
 	return i, err
 }
 
+const getUsersByDepartment = `-- name: GetUsersByDepartment :many
+select id, name, employee_id, password, phone, address, gender, department, position, role, data, created_at, updated_at, email, front_card, back_card
+from user
+where department = ?
+  and role = 'STAFF'
+`
+
+func (q *Queries) GetUsersByDepartment(ctx context.Context, department sql.NullString) ([]User, error) {
+	rows, err := q.query(ctx, q.getUsersByDepartmentStmt, getUsersByDepartment, department)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []User{}
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.EmployeeID,
+			&i.Password,
+			&i.Phone,
+			&i.Address,
+			&i.Gender,
+			&i.Department,
+			&i.Position,
+			&i.Role,
+			&i.Data,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Email,
+			&i.FrontCard,
+			&i.BackCard,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateUserInfoById = `-- name: UpdateUserInfoById :execresult
-update user set data = ? where id = ?
+update user
+set phone      = ?,
+    address    = ?,
+    department = ?,
+    position   = ?,
+    role       = ?,
+    front_card = ?,
+    back_card = ?
+where id = ?
 `
 
 type UpdateUserInfoByIdParams struct {
-	Data sql.NullString `json:"data"`
-	ID   int64          `json:"id"`
+	Phone      sql.NullString `json:"phone"`
+	Address    sql.NullString `json:"address"`
+	Department sql.NullString `json:"department"`
+	Position   sql.NullString `json:"position"`
+	Role       sql.NullString `json:"role"`
+	FrontCard  sql.NullString `json:"front_card"`
+	BackCard   sql.NullString `json:"back_card"`
+	ID         int64          `json:"id"`
 }
 
 func (q *Queries) UpdateUserInfoById(ctx context.Context, arg UpdateUserInfoByIdParams) (sql.Result, error) {
-	return q.exec(ctx, q.updateUserInfoByIdStmt, updateUserInfoById, arg.Data, arg.ID)
+	return q.exec(ctx, q.updateUserInfoByIdStmt, updateUserInfoById,
+		arg.Phone,
+		arg.Address,
+		arg.Department,
+		arg.Position,
+		arg.Role,
+		arg.FrontCard,
+		arg.BackCard,
+		arg.ID,
+	)
 }

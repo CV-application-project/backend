@@ -1,14 +1,13 @@
 package service
 
 import (
-	"Backend-Server/common_error"
+	"Backend-Server/common/ctx_key"
+	"Backend-Server/common/errorz"
 	"context"
 	"errors"
 	"net/http"
 	"strings"
 )
-
-const ContextUserId = "userId"
 
 func (s *Service) authenticationMiddleware(next AppHandleFunc) AppHandleFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
@@ -23,9 +22,11 @@ func (s *Service) authenticationMiddleware(next AppHandleFunc) AppHandleFunc {
 		tokenKey = strings.Split(tokenKey, " ")[1]
 		info, err := s.store.GetUserInfoByToken(ctx, tokenKey)
 		if err != nil {
-			return common_error.ErrUserNotFound
+			return errorz.ErrUserNotFound
 		}
-		ctx = context.WithValue(ctx, ContextUserId, info.UserID)
+		ctx = context.WithValue(ctx, ctx_key.ContextUserId, info.UserID)
+		ctx = context.WithValue(ctx, ctx_key.ContextRole, info.Role.String)
+		ctx = context.WithValue(ctx, ctx_key.ContextDepartment, info.Department.String)
 		r = r.WithContext(ctx)
 		return next(w, r)
 	}
@@ -34,7 +35,7 @@ func (s *Service) authenticationMiddleware(next AppHandleFunc) AppHandleFunc {
 func (s *Service) corsMiddleware(next AppHandleFunc) AppHandleFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Access-Control-Expose-Headers", "Content-Disposition")
-		if r.Context().Value(ContextUserId) == nil {
+		if r.Context().Value(ctx_key.ContextUserId) == nil {
 			return errors.New("missing user id in context")
 		}
 		return next(w, r)

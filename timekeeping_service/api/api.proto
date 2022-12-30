@@ -26,4 +26,16 @@ service TimekeepingService {
       body: "*"
     };
   }
+  rpc UpsertHistoryOfUser(UpsertHistoryOfUserRequest) returns (UpsertHistoryOfUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/timekeeping/upsert",
+      body: "*"
+    };
+  }
+  rpc GetHistoryByList(GetHistoryByListRequest) returns (GetHistoryByListResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/timekeeping/list",
+      body: "*"
+    };
+  }
 }

@@ -22,10 +22,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CVServiceClient interface {
-	RegisterCICForUser(ctx context.Context, in *RegisterCICForUserRequest, opts ...grpc.CallOption) (*RegisterCICForUserResponse, error)
 	GetCICByUserId(ctx context.Context, in *GetCICByUserIdRequest, opts ...grpc.CallOption) (*GetCICByUserIdResponse, error)
 	RegisterUserFace(ctx context.Context, in *RegisterUserFaceRequest, opts ...grpc.CallOption) (*RegisterUserFaceResponse, error)
 	AuthorizeUserFace(ctx context.Context, in *AuthorizeUserFaceRequest, opts ...grpc.CallOption) (*AuthorizeUserFaceResponse, error)
+	UpsertCICForUser(ctx context.Context, in *UpsertCICForUserRequest, opts ...grpc.CallOption) (*UpsertCICForUserResponse, error)
 }
 
 type cVServiceClient struct {
@@ -34,15 +34,6 @@ type cVServiceClient struct {
 
 func NewCVServiceClient(cc grpc.ClientConnInterface) CVServiceClient {
 	return &cVServiceClient{cc}
-}
-
-func (c *cVServiceClient) RegisterCICForUser(ctx context.Context, in *RegisterCICForUserRequest, opts ...grpc.CallOption) (*RegisterCICForUserResponse, error) {
-	out := new(RegisterCICForUserResponse)
-	err := c.cc.Invoke(ctx, "/cv_service.api.CVService/RegisterCICForUser", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *cVServiceClient) GetCICByUserId(ctx context.Context, in *GetCICByUserIdRequest, opts ...grpc.CallOption) (*GetCICByUserIdResponse, error) {
@@ -72,14 +63,23 @@ func (c *cVServiceClient) AuthorizeUserFace(ctx context.Context, in *AuthorizeUs
 	return out, nil
 }
 
+func (c *cVServiceClient) UpsertCICForUser(ctx context.Context, in *UpsertCICForUserRequest, opts ...grpc.CallOption) (*UpsertCICForUserResponse, error) {
+	out := new(UpsertCICForUserResponse)
+	err := c.cc.Invoke(ctx, "/cv_service.api.CVService/UpsertCICForUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CVServiceServer is the server API for CVService service.
 // All implementations must embed UnimplementedCVServiceServer
 // for forward compatibility
 type CVServiceServer interface {
-	RegisterCICForUser(context.Context, *RegisterCICForUserRequest) (*RegisterCICForUserResponse, error)
 	GetCICByUserId(context.Context, *GetCICByUserIdRequest) (*GetCICByUserIdResponse, error)
 	RegisterUserFace(context.Context, *RegisterUserFaceRequest) (*RegisterUserFaceResponse, error)
 	AuthorizeUserFace(context.Context, *AuthorizeUserFaceRequest) (*AuthorizeUserFaceResponse, error)
+	UpsertCICForUser(context.Context, *UpsertCICForUserRequest) (*UpsertCICForUserResponse, error)
 	mustEmbedUnimplementedCVServiceServer()
 }
 
@@ -87,9 +87,6 @@ type CVServiceServer interface {
 type UnimplementedCVServiceServer struct {
 }
 
-func (UnimplementedCVServiceServer) RegisterCICForUser(context.Context, *RegisterCICForUserRequest) (*RegisterCICForUserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegisterCICForUser not implemented")
-}
 func (UnimplementedCVServiceServer) GetCICByUserId(context.Context, *GetCICByUserIdRequest) (*GetCICByUserIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCICByUserId not implemented")
 }
@@ -98,6 +95,9 @@ func (UnimplementedCVServiceServer) RegisterUserFace(context.Context, *RegisterU
 }
 func (UnimplementedCVServiceServer) AuthorizeUserFace(context.Context, *AuthorizeUserFaceRequest) (*AuthorizeUserFaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AuthorizeUserFace not implemented")
+}
+func (UnimplementedCVServiceServer) UpsertCICForUser(context.Context, *UpsertCICForUserRequest) (*UpsertCICForUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertCICForUser not implemented")
 }
 func (UnimplementedCVServiceServer) mustEmbedUnimplementedCVServiceServer() {}
 
@@ -110,24 +110,6 @@ type UnsafeCVServiceServer interface {
 
 func RegisterCVServiceServer(s grpc.ServiceRegistrar, srv CVServiceServer) {
 	s.RegisterService(&CVService_ServiceDesc, srv)
-}
-
-func _CVService_RegisterCICForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterCICForUserRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CVServiceServer).RegisterCICForUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/cv_service.api.CVService/RegisterCICForUser",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CVServiceServer).RegisterCICForUser(ctx, req.(*RegisterCICForUserRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _CVService_GetCICByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -184,6 +166,24 @@ func _CVService_AuthorizeUserFace_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CVService_UpsertCICForUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertCICForUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CVServiceServer).UpsertCICForUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cv_service.api.CVService/UpsertCICForUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CVServiceServer).UpsertCICForUser(ctx, req.(*UpsertCICForUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CVService_ServiceDesc is the grpc.ServiceDesc for CVService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -191,10 +191,6 @@ var CVService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "cv_service.api.CVService",
 	HandlerType: (*CVServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "RegisterCICForUser",
-			Handler:    _CVService_RegisterCICForUser_Handler,
-		},
 		{
 			MethodName: "GetCICByUserId",
 			Handler:    _CVService_GetCICByUserId_Handler,
@@ -206,6 +202,10 @@ var CVService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AuthorizeUserFace",
 			Handler:    _CVService_AuthorizeUserFace_Handler,
+		},
+		{
+			MethodName: "UpsertCICForUser",
+			Handler:    _CVService_UpsertCICForUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

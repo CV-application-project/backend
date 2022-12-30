@@ -7,12 +7,6 @@ import "library/googleapis/google/api/annotations.proto";
 import "cv_service/api/data.proto";
 
 service CVService {
-  rpc RegisterCICForUser(RegisterCICForUserRequest) returns (RegisterCICForUserResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/cic/register",
-      body: "*"
-    };
-  }
   rpc GetCICByUserId(GetCICByUserIdRequest) returns (GetCICByUserIdResponse) {
     option (google.api.http) = {
       post: "/api/v1/cic/get",
@@ -29,6 +23,12 @@ service CVService {
     option (google.api.http) = {
       post: "/api/v1/face/authorize",
       body:"*"
+    };
+  }
+  rpc UpsertCICForUser(UpsertCICForUserRequest) returns (UpsertCICForUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/cic/upsert",
+      body: "*"
     };
   }
 }

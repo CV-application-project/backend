@@ -83,3 +83,29 @@ func (s *Service) HTTPUpdateHistoryOfUser(w http.ResponseWriter, r *http.Request
 	}
 	return nil
 }
+
+func (s *Service) HTTPUpsertHistoryOfUser(w http.ResponseWriter, r *http.Request) error {
+	logger := s.log.WithName("HTTPUpsertHistoryOfUser")
+	var err error
+	if r.Method != "POST" {
+		err = errors.New("invalid HTTP method")
+		logger.Error(err, "POST")
+		return err
+	}
+	var request timekeepingApi.UpsertHistoryOfUserRequest
+	if err = json.NewDecoder(r.Body).Decode(&request); err != nil {
+		logger.Error(err, "json | decode")
+		return err
+	}
+	resp, err := s.timekeepingClient.UpsertHistoryOfUser(r.Context(), &request)
+	if err != nil {
+		logger.Error(err, "timekeepingClient | UpsertHistoryOfUser")
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if err = json.NewEncoder(w).Encode(resp); err != nil {
+		logger.Error(err, "json | encode")
+		return err
+	}
+	return nil
+}

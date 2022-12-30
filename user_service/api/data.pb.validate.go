@@ -454,3 +454,529 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AuthorizeUserResponseValidationError{}
+
+// Validate checks the field values on UpdateUserInfoRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpdateUserInfoRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetAssignerId() <= 0 {
+		return UpdateUserInfoRequestValidationError{
+			field:  "AssignerId",
+			reason: "value must be greater than 0",
+		}
+	}
+
+	if _, ok := _UpdateUserInfoRequest_AssignerRole_NotInLookup[m.GetAssignerRole()]; ok {
+		return UpdateUserInfoRequestValidationError{
+			field:  "AssignerRole",
+			reason: "value must not be in list [0 2]",
+		}
+	}
+
+	if m.GetUpdateData() == nil {
+		return UpdateUserInfoRequestValidationError{
+			field:  "UpdateData",
+			reason: "value is required",
+		}
+	}
+
+	if v, ok := interface{}(m.GetUpdateData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateUserInfoRequestValidationError{
+				field:  "UpdateData",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// UpdateUserInfoRequestValidationError is the validation error returned by
+// UpdateUserInfoRequest.Validate if the designated constraints aren't met.
+type UpdateUserInfoRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateUserInfoRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateUserInfoRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateUserInfoRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateUserInfoRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateUserInfoRequestValidationError) ErrorName() string {
+	return "UpdateUserInfoRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateUserInfoRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateUserInfoRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateUserInfoRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateUserInfoRequestValidationError{}
+
+var _UpdateUserInfoRequest_AssignerRole_NotInLookup = map[UserRole]struct{}{
+	0: {},
+	2: {},
+}
+
+// Validate checks the field values on UpdateInfo with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *UpdateInfo) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for UserId
+
+	// no validation rules for Phone
+
+	// no validation rules for Address
+
+	// no validation rules for Department
+
+	// no validation rules for Position
+
+	// no validation rules for Role
+
+	// no validation rules for Data
+
+	// no validation rules for FrontCard
+
+	// no validation rules for BackCard
+
+	return nil
+}
+
+// UpdateInfoValidationError is the validation error returned by
+// UpdateInfo.Validate if the designated constraints aren't met.
+type UpdateInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateInfoValidationError) ErrorName() string { return "UpdateInfoValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UpdateInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateInfoValidationError{}
+
+// Validate checks the field values on UpdateUserInfoResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpdateUserInfoResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateUserInfoResponseValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// UpdateUserInfoResponseValidationError is the validation error returned by
+// UpdateUserInfoResponse.Validate if the designated constraints aren't met.
+type UpdateUserInfoResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateUserInfoResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateUserInfoResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateUserInfoResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateUserInfoResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateUserInfoResponseValidationError) ErrorName() string {
+	return "UpdateUserInfoResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateUserInfoResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateUserInfoResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateUserInfoResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateUserInfoResponseValidationError{}
+
+// Validate checks the field values on ExportUsersByDepartmentRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ExportUsersByDepartmentRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetAssignerId() <= 0 {
+		return ExportUsersByDepartmentRequestValidationError{
+			field:  "AssignerId",
+			reason: "value must be greater than 0",
+		}
+	}
+
+	if _, ok := _ExportUsersByDepartmentRequest_AssignerRole_NotInLookup[m.GetAssignerRole()]; ok {
+		return ExportUsersByDepartmentRequestValidationError{
+			field:  "AssignerRole",
+			reason: "value must not be in list [0 2]",
+		}
+	}
+
+	return nil
+}
+
+// ExportUsersByDepartmentRequestValidationError is the validation error
+// returned by ExportUsersByDepartmentRequest.Validate if the designated
+// constraints aren't met.
+type ExportUsersByDepartmentRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExportUsersByDepartmentRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExportUsersByDepartmentRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExportUsersByDepartmentRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExportUsersByDepartmentRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExportUsersByDepartmentRequestValidationError) ErrorName() string {
+	return "ExportUsersByDepartmentRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ExportUsersByDepartmentRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExportUsersByDepartmentRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExportUsersByDepartmentRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExportUsersByDepartmentRequestValidationError{}
+
+var _ExportUsersByDepartmentRequest_AssignerRole_NotInLookup = map[UserRole]struct{}{
+	0: {},
+	2: {},
+}
+
+// Validate checks the field values on ExportUsersByDepartmentResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ExportUsersByDepartmentResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	for idx, item := range m.GetData() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ExportUsersByDepartmentResponseValidationError{
+					field:  fmt.Sprintf("Data[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ExportUsersByDepartmentResponseValidationError is the validation error
+// returned by ExportUsersByDepartmentResponse.Validate if the designated
+// constraints aren't met.
+type ExportUsersByDepartmentResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExportUsersByDepartmentResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExportUsersByDepartmentResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExportUsersByDepartmentResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExportUsersByDepartmentResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExportUsersByDepartmentResponseValidationError) ErrorName() string {
+	return "ExportUsersByDepartmentResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ExportUsersByDepartmentResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExportUsersByDepartmentResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExportUsersByDepartmentResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExportUsersByDepartmentResponseValidationError{}
+
+// Validate checks the field values on User with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *User) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for EmployeeId
+
+	// no validation rules for Name
+
+	// no validation rules for Phone
+
+	// no validation rules for Gender
+
+	// no validation rules for Address
+
+	// no validation rules for Department
+
+	// no validation rules for Position
+
+	// no validation rules for Role
+
+	// no validation rules for Email
+
+	// no validation rules for FrontCard
+
+	// no validation rules for BackCard
+
+	return nil
+}
+
+// UserValidationError is the validation error returned by User.Validate if the
+// designated constraints aren't met.
+type UserValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UserValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UserValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UserValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UserValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UserValidationError) ErrorName() string { return "UserValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UserValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUser.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UserValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UserValidationError{}
