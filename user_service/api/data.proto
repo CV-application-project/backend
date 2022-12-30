@@ -40,7 +40,7 @@ message UserToken {
 
 message AuthorizeUserRequest {
   string employee_id = 1 [(validate.rules).string = {min_len:1, max_len:50}];
-  string email = 2 [(validate.rules).string = {min_len:1, max_len:255}];
+  string email = 2;
   string password = 3 [(validate.rules).string = {min_len:8, max_len:255}];
 }
 

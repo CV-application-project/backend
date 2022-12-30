@@ -2,6 +2,7 @@ package service
 
 import (
 	"Backend-Server/common/ctx_key"
+	"Backend-Server/common/helper"
 	"Backend-Server/gateway/api"
 	"Backend-Server/gateway/store"
 	userApi "Backend-Server/user_service/api"
@@ -10,6 +11,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"github.com/google/uuid"
 	"github.com/spf13/cast"
 	"io"
 	"net/http"
@@ -23,6 +25,10 @@ func (s *Service) RegisterNewUser(ctx context.Context, req *api.RegisterNewUserR
 	if err := req.Validate(); err != nil {
 		logger.Error(err, "Validate request failed")
 		return nil, err
+	}
+
+	if req.Email == helper.EmptyString {
+		req.Email = uuid.New().String()
 	}
 
 	userReq := &userApi.RegisterUserRequest{
@@ -73,7 +79,9 @@ func (s *Service) RegisterNewUser(ctx context.Context, req *api.RegisterNewUserR
 
 func (s *Service) AuthorizeUser(ctx context.Context, req *api.AuthorizeUserRequest) (*api.AuthorizeUserResponse, error) {
 	logger := s.log.WithName("AuthorizeUser")
-
+	if req.Email == helper.EmptyString {
+		req.Email = uuid.New().String()
+	}
 	user, err := s.store.GetUserInfoByUsernameOrEmail(ctx, store.GetUserInfoByUsernameOrEmailParams{
 		EmployeeID: req.EmployeeId,
 		Email:      req.Email,

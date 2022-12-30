@@ -17,6 +17,9 @@ import (
 func (s *Service) RegisterUser(ctx context.Context, req *api.RegisterUserRequest) (*api.RegisterUserResponse, error) {
 	logger := s.log.WithName("RegisterUser").WithValues("traceId", req.EmployeeId)
 	// Check whether user with this username exists?
+	if req.Email == helper.EmptyString {
+		req.Email = uuid.New().String()
+	}
 	user, err := s.store.GetUserByUsernameOrEmail(ctx, store.GetUserByUsernameOrEmailParams{
 		EmployeeID: req.EmployeeId,
 		Email:      req.Email,
@@ -99,13 +102,15 @@ func (s *Service) RegisterUser(ctx context.Context, req *api.RegisterUserRequest
 
 func (s *Service) AuthorizeUser(ctx context.Context, req *api.AuthorizeUserRequest) (*api.AuthorizeUserResponse, error) {
 	traceId := ""
-	if req.EmployeeId != "" {
+	if req.EmployeeId != helper.EmptyString {
 		traceId = req.EmployeeId
-	} else if req.Email != "" {
+	} else if req.Email != helper.EmptyString {
 		traceId = req.Email
 	}
 	logger := s.log.WithName("AuthorizeUser").WithValues("userId", traceId)
-
+	if req.Email == helper.EmptyString {
+		req.Email = uuid.New().String()
+	}
 	user, err := s.store.GetUserByUsernameOrEmail(ctx, store.GetUserByUsernameOrEmailParams{
 		EmployeeID: req.EmployeeId,
 		Email:      req.Email,

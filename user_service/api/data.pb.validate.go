@@ -301,12 +301,7 @@ func (m *AuthorizeUserRequest) Validate() error {
 		}
 	}
 
-	if l := utf8.RuneCountInString(m.GetEmail()); l < 1 || l > 255 {
-		return AuthorizeUserRequestValidationError{
-			field:  "Email",
-			reason: "value length must be between 1 and 255 runes, inclusive",
-		}
-	}
+	// no validation rules for Email
 
 	if l := utf8.RuneCountInString(m.GetPassword()); l < 8 || l > 255 {
 		return AuthorizeUserRequestValidationError{
